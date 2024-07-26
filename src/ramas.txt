@@ -1,0 +1,50 @@
+Gitflow
+features - caracteristicas
+
+              -- feature/registro   -  "git pull origin dev"
+main -- dev   <-- feature/homepage
+
+
+Cada vez que se ingresa a codear hacer "git pull" en la rama dev. Vovler a rama y hacer "git merge dev"
+
+Cada vez que quiero pushear - camino largo por consola:
+ - git status -> mostrar cambios en general
+ - git add . -> preparar todos los archivos para la subida
+ - git add . "ruta del arhivo" - > prepara un archivo para la subida
+ - git commit -m "Crear archivo ramas.txt para la descripcion de gitflow"
+ - git push -> subir archivos modificados o creados a la rama en la que se encuentra el usuario
+
+
+
+Secciones
+
+Autenticacion   - Login
+                - registro
+                - manejo sesiones
+                - validaciones
+                - autorizaciones
+
+HomePage        - Logo
+                - Presentacion / descripcion
+                - navbar
+                - footer
+                - boton iniciar sesion
+
+PaginaPrincipal - Lista de servidores 
+                - Vista de slack como modelo
+                - Servidor por defecto -> Lista de canales
+                - Canal por defecto -> muestra de mensajes
+
+MEnsajeria      - Mensajeria del canales
+                - Mensajeria privada
+
+
+Servidores      - Unir usuario a un servidores
+                - Crud servidor
+                - Invitar a servidor
+
+Canales         - CRUD canales
+                - Autorizacion
+
+
+Mensajes        - CRUD mensajes
