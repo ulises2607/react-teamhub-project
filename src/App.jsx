@@ -1,10 +1,19 @@
 import "./App.css";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import LoginForm from "./components/pages/Authentication/LoginForm";
 
 function App() {
   return (
-    <main className="w-[100%] h-[50vh] m-5 bg-[#680a0a] flex justify-center items-center ">
-      Main component
-    </main>
+    <Router>
+      <Routes>
+        <Route path="login" element={<LoginForm />} />
+      </Routes>
+    </Router>
   );
 }
 
