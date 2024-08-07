@@ -1,14 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-const servers = ['Server 1', 'Server 2', 'Server 3'];
+const ServerList = ({ onSelectServer }) => {
+  const [servers, setServers] = useState([]);
 
-const ServerList = () => {
+  useEffect(() => {
+    const fetchServers = async () => {
+      try {
+        const response = await fetch('https://sandbox.academiadevelopers.com/servers');
+        const data = await response.json();
+        setServers(data);
+      } catch (error) {
+        console.error('Error fetching servers:', error);
+      }
+    };
+
+    fetchServers();
+  }, []);
+
   return (
-    <div className="w-1/5 bg-gray-800 text-white">
+    <div className="w-1/4 bg-gray-800 text-white">
       <ul>
-        {servers.map((server, index) => (
-          <li key={index} className="p-4 hover:bg-gray-700 cursor-pointer">
-            {server}
+        {servers.map((server) => (
+          <li
+            key={server.id}
+            className="p-4 hover:bg-gray-600 cursor-pointer"
+            onClick={() => onSelectServer(server.id)}
+          >
+            {server.name}
           </li>
         ))}
       </ul>
