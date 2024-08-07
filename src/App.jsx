@@ -5,13 +5,17 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import LoginForm from "./components/pages/Authentication/LoginForm";
+import HomePage from "./components/pages/home/HomePage";
+import AuthenticationPage from "./components/pages/Authentication/AuthenticationPage";
+import ServerList from "./components/pages/ServerList";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="login" element={<LoginForm />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="login" element={<AuthenticationPage />} />
+        <Route path="servers" element={<ServerList />} />
       </Routes>
     </Router>
   );
