@@ -1,9 +1,10 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 const base_url = import.meta.env.VITE_API_URL;
 const authorization = import.meta.env.VITE_AUTHORIZATION;
 
+// Estado inicial de los servers
 const initialState = {
   servers: [],
   isLoading: false,
@@ -11,14 +12,15 @@ const initialState = {
   messages: null,
 };
 
+// Post Server
 export const createServer = createAsyncThunk(
-  'server/createServer',
+  "server/createServer",
   async (serverData, { rejectWithValue }) => {
     try {
       const formData = new FormData();
-      formData.append('name', serverData.name);
-      formData.append('description', serverData.description);
-      formData.append('icon', serverData.icon);
+      formData.append("name", serverData.name);
+      formData.append("description", serverData.description);
+      formData.append("icon", serverData.icon);
 
       const response = await axios.post(
         `${base_url}/teamhub/servers`,
@@ -26,7 +28,7 @@ export const createServer = createAsyncThunk(
         {
           headers: {
             Authorization: `Token ${authorization}`,
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -36,7 +38,7 @@ export const createServer = createAsyncThunk(
     } catch (error) {
       if (error.response && error.response.data) {
         return rejectWithValue(
-          error.response.data.message || 'Failed to create server'
+          error.response.data.message || "Failed to create server"
         );
       }
       return rejectWithValue(error.message);
@@ -44,22 +46,23 @@ export const createServer = createAsyncThunk(
   }
 );
 
-export const getServers = createAsyncThunk('server/getServers', async () => {
+// Obtención de servidores
+export const getServers = createAsyncThunk("server/getServers", async () => {
   try {
     const response = await axios.get(`${base_url}/teamhub/servers`, {
       headers: {
         Authorization: `Token ${authorization}`,
       },
     });
-    const servers = response.data;
-    return servers.results;
+    const servers = response.data.results;
+    return servers;
   } catch (error) {
     throw new Error(error.message);
   }
 });
 
 export const serversSlice = createSlice({
-  name: 'servers',
+  name: "servers",
   initialState,
   reducers: {},
   extraReducers: (builder) => {

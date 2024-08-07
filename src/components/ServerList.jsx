@@ -12,7 +12,7 @@ const ServerList = ({ onSelectServer }) => {
   }, [dispatch]);
 
   if (isLoading) {
-    return <div>Loading servers...</div>;
+    return <div>Cargando servidores...</div>;
   }
 
   return (

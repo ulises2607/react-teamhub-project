@@ -8,7 +8,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    // Aquí puedes agregar la lógica de autenticación
+    // Agregar la lógica de autenticación
     dispatch(setUser({ name: username, email: `${username}@example.com` }));
   };
 

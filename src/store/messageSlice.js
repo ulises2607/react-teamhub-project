@@ -15,7 +15,7 @@ export const getMessages = createAsyncThunk(
   'messages/getMessages',
   async (channelId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${base_url}/channels/${channelId}/messages`, {
+      const response = await axios.get(`${base_url}/teamhub/messages/${channelId}`, {
         headers: {
           Authorization: `Token ${authorization}`,
         },
@@ -36,7 +36,7 @@ export const sendMessage = createAsyncThunk(
   async ({ channelId, text }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `${base_url}/channels/${channelId}/messages`,
+        `${base_url}/teamhub/messages/${channelId}`,
         { text },
         {
           headers: {

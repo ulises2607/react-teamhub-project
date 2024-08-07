@@ -14,14 +14,14 @@ const ChannelList = ({ currentServer, onSelectChannel, onCreateChannel }) => {
   }, [dispatch, currentServer]);
 
   if (isLoading) {
-    return <div>Loading channels...</div>;
+    return <div>Cargando canales...</div>;
   }
 
   return (
     <div className="p-4 bg-gray-700 h-full">
-      <h2 className="text-white text-lg mb-4">Channels</h2>
+      <h2 className="text-white text-lg mb-4">Canales</h2>
       {channels.length === 0 ? (
-        <div className="text-white mb-4">No channels available</div>
+        <div className="text-white mb-4">No hay canales disponibles</div>
       ) : (
         <ul>
           {channels.map((channel) => (
@@ -39,7 +39,7 @@ const ChannelList = ({ currentServer, onSelectChannel, onCreateChannel }) => {
         onClick={onCreateChannel}
         className="mt-4 p-2 bg-blue-500 rounded text-white"
       >
-        Create Channel
+        Crear canal
       </button>
     </div>
   );

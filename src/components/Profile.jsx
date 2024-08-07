@@ -12,7 +12,7 @@ const Profile = () => {
       <button onClick={toggleMenu} className="flex items-center">
         <img
           className="w-10 h-10 rounded-full"
-          src="https://via.placeholder.com/40"
+          src="https://https://sandbox.academiadevelopers.com/user/profiles/1"
           alt="User"
         />
       </button>

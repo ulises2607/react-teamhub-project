@@ -15,7 +15,7 @@ export const getChannels = createAsyncThunk(
   'channels/getChannels',
   async (serverId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${base_url}/servers/${serverId}/channels`, {
+      const response = await axios.get(`${base_url}/teamhub/channels/${serverId}`, {
         headers: {
           Authorization: `Token ${authorization}`,
         },
@@ -23,7 +23,7 @@ export const getChannels = createAsyncThunk(
       return response.data;
     } catch (error) {
       if (error.response && error.response.data) {
-        return rejectWithValue(error.response.data.message || 'Failed to get channels');
+        return rejectWithValue(error.response.data.message || 'Error al obtener canales');
       }
       return rejectWithValue(error.message);
     }
@@ -36,7 +36,7 @@ export const createChannel = createAsyncThunk(
   async ({ serverId, name }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `${base_url}/servers/${serverId}/channels`,
+        `${base_url}/teamhub/channels/${serverId}`,
         { name },
         {
           headers: {
@@ -48,7 +48,7 @@ export const createChannel = createAsyncThunk(
       return response.data;
     } catch (error) {
       if (error.response && error.response.data) {
-        return rejectWithValue(error.response.data.message || 'Failed to create channel');
+        return rejectWithValue(error.response.data.message || 'Error al crear canal');
       }
       return rejectWithValue(error.message);
     }
