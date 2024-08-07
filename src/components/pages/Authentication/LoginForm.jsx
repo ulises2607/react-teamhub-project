@@ -2,7 +2,7 @@ import React from "react";
 
 const LoginForm = () => {
   return (
-    <div className="">
+    <div className="w-full h-screen">
       <div className="h-full flex ">
         <div className="hidden lg:flex w-full lg:w-1/2 justify-around items-center login_img_section">
           <div className="bg-black opacity-20 inset-0 z-0"></div>
