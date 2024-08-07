@@ -1,10 +1,15 @@
-import "./App.css";
+import React from 'react';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import Login from './components/Login';
+import MainPage from './components/MainPage';
 
 function App() {
   return (
-    <main className="w-[100%] h-[50vh] m-5 bg-[#680a0a] flex justify-center items-center ">
-      Main component
-    </main>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/main" element={<MainPage />} />
+      <Route path="*" element={<Navigate to="/login" />} />
+    </Routes>
   );
 }
 
