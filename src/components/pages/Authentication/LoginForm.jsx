@@ -1,6 +1,29 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../../../redux/auth/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
+  const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+
+  console.log("Lo que hay en el auth: ", auth);
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+
+    const username = formData.get("username");
+    const password = formData.get("password");
+
+    dispatch(login({ username, password }));
+  };
+
+  if (auth.token !== null) {
+    navigate("/servers");
+  }
+
   return (
     <div className="w-full h-screen">
       <div className="h-full flex ">
@@ -23,7 +46,10 @@ const LoginForm = () => {
         </div>
         <div className="flex w-full lg:w-1/2 justify-center items-center bg-white space-y-8">
           <div className="w-full px-8 md:px-32 lg:px-24">
-            <form className="bg-white rounded-md shadow-2xl p-5">
+            <form
+              onSubmit={handleSubmit}
+              className="bg-white rounded-md shadow-2xl p-5"
+            >
               <h1 className="text-gray-800 font-bold text-2xl mb-1">
                 Hello Again!
               </h1>
