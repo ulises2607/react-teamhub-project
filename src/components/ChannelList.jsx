@@ -1,37 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getChannels } from '../store/channelSlice';
 
-const ChannelList = ({ currentServer, onSelectChannel }) => {
-  const [channels, setChannels] = useState([]);
+const ChannelList = ({ currentServer, onSelectChannel, onCreateChannel }) => {
+  const dispatch = useDispatch();
+  const channels = useSelector((state) => state.channels.channels);
+  const isLoading = useSelector((state) => state.channels.isLoading);
 
   useEffect(() => {
-    const fetchChannels = async () => {
-      if (!currentServer) return;
+    if (currentServer) {
+      dispatch(getChannels(currentServer));
+    }
+  }, [dispatch, currentServer]);
 
-      try {
-        const response = await fetch(`https://sandbox.academiadevelopers.com/servers/${currentServer}/channels`);
-        const data = await response.json();
-        setChannels(data);
-      } catch (error) {
-        console.error('Error fetching channels:', error);
-      }
-    };
-
-    fetchChannels();
-  }, [currentServer]);
+  if (isLoading) {
+    return <div>Loading channels...</div>;
+  }
 
   return (
-    <div className="w-1/4 bg-gray-700 text-white">
-      <ul>
-        {channels.map((channel) => (
-          <li
-            key={channel.id}
-            className="p-4 hover:bg-gray-600 cursor-pointer"
-            onClick={() => onSelectChannel(channel.id)}
-          >
-            {channel.name}
-          </li>
-        ))}
-      </ul>
+    <div className="p-4 bg-gray-700 h-full">
+      <h2 className="text-white text-lg mb-4">Channels</h2>
+      {channels.length === 0 ? (
+        <div className="text-white mb-4">No channels available</div>
+      ) : (
+        <ul>
+          {channels.map((channel) => (
+            <li
+              key={channel.id}
+              className="mb-2 text-white cursor-pointer"
+              onClick={() => onSelectChannel(channel.id)}
+            >
+              {channel.name}
+            </li>
+          ))}
+        </ul>
+      )}
+      <button
+        onClick={onCreateChannel}
+        className="mt-4 p-2 bg-blue-500 rounded text-white"
+      >
+        Create Channel
+      </button>
     </div>
   );
 };

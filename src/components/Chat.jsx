@@ -1,75 +1,53 @@
-import React, { useState, useEffect } from 'react';
-
-const URL_BASE = import.meta.env.VITE_API_URL
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getMessages, sendMessage } from '../store/messageSlice';
 
 const Chat = ({ currentChannel }) => {
-  const [messages, setMessages] = useState([]);
+  const dispatch = useDispatch();
+  const messages = useSelector((state) => state.messages.messages);
+  const isLoading = useSelector((state) => state.messages.isLoading);
   const [newMessage, setNewMessage] = useState('');
 
   useEffect(() => {
-    // Aqui se enviarian los messages
-    const fetchMessages = async () => {
-      try {
-        const response = await fetch(`https://api.com`);
-        const data = await response.json();
-        setMessages(data);
-      } catch (error) {
-        console.error('Error fetching messages:', error);
-      }
-    };
+    if (currentChannel) {
+      dispatch(getMessages(currentChannel));
+    }
+  }, [dispatch, currentChannel]);
 
-    fetchMessages();
-  }, [currentChannel]);
-
-  const handleSendMessage = async (e) => {
-    e.preventDefault();
-    if (!newMessage.trim()) return;
-
-    // Aquí iría la lógica de envío de mensaje real
-    try {
-      const response = await fetch(`https://api.com`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ content: newMessage }),
-      });
-
-      if (response.ok) {
-        const message = await response.json();
-        setMessages([...messages, message]);
-        setNewMessage('');
-      }
-    } catch (error) {
-      console.error('Error sending message:', error);
+  const handleSendMessage = () => {
+    if (newMessage.trim() !== '') {
+      dispatch(sendMessage({ channelId: currentChannel, text: newMessage }));
+      setNewMessage('');
     }
   };
 
+  if (isLoading) {
+    return <div>Cargando...</div>;
+  }
+
   return (
-    <div className="flex-1 flex flex-col bg-gray-100 p-4">
-      <div className="flex-1 overflow-y-auto mb-4">
-        {messages.map((message, index) => (
-          <div key={index} className="p-2 my-2 bg-white rounded shadow">
-            <p className="font-bold">{message.username}</p>
-            <p>{message.content}</p>
+    <div className="flex flex-col flex-grow bg-gray-600 text-white">
+      <div className="flex-grow p-4 overflow-y-auto">
+        {messages.map((message) => (
+          <div key={message.id} className="mb-2">
+            <strong>{message.user}</strong>: {message.text}
           </div>
         ))}
       </div>
-      <form onSubmit={handleSendMessage} className="flex">
+      <div className="p-4 bg-gray-700">
         <input
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          className="flex-1 p-2 border rounded-l-md"
-          placeholder="Escribe un mensaje..."
+          className="w-full p-2 rounded bg-gray-800 text-white"
         />
         <button
-          type="submit"
-          className="p-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-700"
+          onClick={handleSendMessage}
+          className="mt-2 p-2 bg-blue-500 rounded text-white"
         >
           Enviar
         </button>
-      </form>
+      </div>
     </div>
   );
 };

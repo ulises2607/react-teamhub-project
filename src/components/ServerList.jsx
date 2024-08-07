@@ -1,31 +1,28 @@
-import React, { useState, useEffect } from 'react';
-
-const URL_BASE = import.meta.env.VITE_API_URL
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getServers } from '../store/serverSlice';
 
 const ServerList = ({ onSelectServer }) => {
-  const [servers, setServers] = useState([]);
+  const dispatch = useDispatch();
+  const servers = useSelector((state) => state.servers.servers);
+  const isLoading = useSelector((state) => state.servers.isLoading);
 
   useEffect(() => {
-    const fetchServers = async () => {
-      try {
-        const response = await fetch('https://api/');
-        const data = await response.json();
-        setServers(data);
-      } catch (error) {
-        console.error('Error fetching servers:', error);
-      }
-    };
+    dispatch(getServers());
+  }, [dispatch]);
 
-    fetchServers();
-  }, []);
+  if (isLoading) {
+    return <div>Loading servers...</div>;
+  }
 
   return (
-    <div className="w-1/4 bg-gray-800 text-white">
+    <div className="p-4 bg-gray-700 h-full">
+      <h2 className="text-white text-lg mb-4">Servers</h2>
       <ul>
         {servers.map((server) => (
           <li
             key={server.id}
-            className="p-4 hover:bg-gray-600 cursor-pointer"
+            className="mb-2 text-white cursor-pointer"
             onClick={() => onSelectServer(server.id)}
           >
             {server.name}
