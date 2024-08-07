@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 const base_url = import.meta.env.VITE_API_URL;
 const authorization = import.meta.env.VITE_AUTHORIZATION;
@@ -10,12 +10,37 @@ const initialState = {
   errors: null,
 };
 
-// Obtención de mensajes
+// Obtener mensajes de un canal
 export const getMessages = createAsyncThunk(
-  'messages/getMessages',
+  "messages/getMessages",
   async (channelId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${base_url}/teamhub/messages/${channelId}`, {
+      const response = await axios.get(`${base_url}/teamhub/messages/`, {
+        headers: {
+          Authorization: `Token ${authorization}`,
+        },
+        params: {
+          channel: channelId,
+        },
+      });
+      return response.data.results;
+    } catch (error) {
+      if (error.response && error.response.data) {
+        return rejectWithValue(
+          error.response.data.message || "Failed to fetch messages"
+        );
+      }
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Enviar un nuevo mensaje
+export const sendMessage = createAsyncThunk(
+  "messages/sendMessage",
+  async (messageData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${base_url}/teamhub/messages/`, messageData, {
         headers: {
           Authorization: `Token ${authorization}`,
         },
@@ -23,40 +48,17 @@ export const getMessages = createAsyncThunk(
       return response.data;
     } catch (error) {
       if (error.response && error.response.data) {
-        return rejectWithValue(error.response.data.message || 'Failed to get messages');
+        return rejectWithValue(
+          error.response.data.message || "Failed to send message"
+        );
       }
       return rejectWithValue(error.message);
     }
   }
 );
 
-// Envío de mensajes
-export const sendMessage = createAsyncThunk(
-  'messages/sendMessage',
-  async ({ channelId, text }, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(
-        `${base_url}/teamhub/messages/${channelId}`,
-        { text },
-        {
-          headers: {
-            Authorization: `Token ${authorization}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      if (error.response && error.response.data) {
-        return rejectWithValue(error.response.data.message || 'Failed to send message');
-      }
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-const messagesSlice = createSlice({
-  name: 'messages',
+const messageSlice = createSlice({
+  name: "messages",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -86,4 +88,4 @@ const messagesSlice = createSlice({
   },
 });
 
-export default messagesSlice.reducer;
+export default messageSlice.reducer;

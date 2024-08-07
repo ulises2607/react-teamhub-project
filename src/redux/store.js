@@ -3,6 +3,7 @@ import userReducer from './userSlice';
 import serversReducer from './serverSlice';
 import messagesReducer from './messageSlice';
 import channelsReducer from './channelSlice';
+import messageReducer from "./messageSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     servers: serversReducer,
     messages: messagesReducer,
     channels: channelsReducer,
+    messages: messageReducer,
   },
 });
 

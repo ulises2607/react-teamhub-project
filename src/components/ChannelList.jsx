@@ -4,42 +4,46 @@ import { getChannels } from '../redux/channelSlice';
 
 const ChannelList = ({ currentServer, onSelectChannel, onCreateChannel }) => {
   const dispatch = useDispatch();
-  const channels = useSelector((state) => state.channels.channels);
-  const isLoading = useSelector((state) => state.channels.isLoading);
+  const channelsState = useSelector((state) => state.channels);
 
   useEffect(() => {
-    if (currentServer) {
-      dispatch(getChannels(currentServer));
-    }
-  }, [dispatch, currentServer]);
+    dispatch(getChannels());
+  }, [dispatch]);
 
-  if (isLoading) {
-    return <div>Cargando canales...</div>;
-  }
+  const filteredChannels = channelsState.channels.filter(
+    (channel) => channel.server === currentServer
+  );
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Channels</h2>
-      {channelsState.isLoading && <p>Loading...</p>}
-      {channelsState.errors && <p className="text-red-500">{channelsState.errors}</p>}
+      {channelsState.isLoading && <p>Cargando...</p>}
+      {channelsState.errors && (
+        <p className="text-red-500">{channelsState.errors}</p>
+      )}
       <ul className="list-none pl-0">
-        {channelsState.channels.map((channel) => (
-          <li key={channel.id} className="mb-2">
+        {filteredChannels.length > 0 ? (
+          filteredChannels.map((channel) => (
+            <li key={channel.id} className="mb-2">
+              <button
+                onClick={() => onSelectChannel(channel.id)}
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-900 hover:text-white"
+              >
+                {channel.name}
+              </button>
+            </li>
+          ))
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <span className="text-white">No hay canales disponibles. Crea uno!</span>
             <button
-              onClick={() => onSelectChannel(channel.id)}
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-900 hover:text-white"
+              onClick={onCreateChannel}
+              className="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
             >
-              {channel.name}
+              Crear Canal
             </button>
-          </li>
-        ))}
+          </div>
+        )}
       </ul>
-      <button
-        onClick={onCreateChannel}
-        className="mt-4 p-2 bg-blue-500 rounded text-white"
-      >
-        Create Channel
-      </button>
     </div>
   );
 };

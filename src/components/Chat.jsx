@@ -1,53 +1,62 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { getMessages, sendMessage } from '../redux/messageSlice';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getMessages, sendMessage } from "../redux/messageSlice";
 
 const Chat = ({ currentChannel }) => {
   const dispatch = useDispatch();
-  const messages = useSelector((state) => state.messages.messages);
-  const isLoading = useSelector((state) => state.messages.isLoading);
-  const [newMessage, setNewMessage] = useState('');
+  const messagesState = useSelector((state) => state.messages);
+  const [newMessage, setNewMessage] = useState("");
 
   useEffect(() => {
     if (currentChannel) {
       dispatch(getMessages(currentChannel));
     }
-  }, [dispatch, currentChannel]);
+  }, [currentChannel, dispatch]);
 
-  const handleSendMessage = () => {
-    if (newMessage.trim() !== '') {
-      dispatch(sendMessage({ channelId: currentChannel, text: newMessage }));
-      setNewMessage('');
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+    if (newMessage.trim() && currentChannel) {
+      const messageData = {
+        channel: currentChannel,
+        content: newMessage,
+      };
+      dispatch(sendMessage(messageData));
+      setNewMessage("");
     }
   };
 
-  if (isLoading) {
-    return <div>Cargando...</div>;
-  }
-
   return (
-    <div className="flex flex-col flex-grow bg-gray-600 text-white">
-      <div className="flex-grow p-4 overflow-y-auto">
-        {messages.map((message) => (
-          <div key={message.id} className="mb-2">
-            <strong>{message.user}</strong>: {message.text}
+    <div className="flex flex-col h-full">
+      <div className="flex-grow p-4 overflow-y-auto bg-gray-600">
+        {messagesState.isLoading ? (
+          <p className="text-white">Cargando...</p>
+        ) : messagesState.errors ? (
+          <p className="text-red-500">{messagesState.errors}</p>
+        ) : (
+          <div>
+            {messagesState.messages.map((message) => (
+              <div key={message.id} className="mb-2 p-2 bg-gray-800 rounded">
+                <p className="text-white">{message.content}</p>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
       </div>
-      <div className="p-4 bg-gray-700">
+      <form onSubmit={handleSendMessage} className="p-4 bg-gray-800">
         <input
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          className="w-full p-2 rounded bg-gray-800 text-white"
+          className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          placeholder="Escribe un mensaje..."
         />
         <button
-          onClick={handleSendMessage}
-          className="mt-2 p-2 bg-blue-500 rounded text-white"
+          type="submit"
+          className="mt-2 w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           Enviar
         </button>
-      </div>
+      </form>
     </div>
   );
 };

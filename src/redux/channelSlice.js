@@ -11,24 +11,19 @@ const initialState = {
 };
 
 // Obtención de canales
-export const getChannels = createAsyncThunk(
-  'channels/getChannels',
-  async (serverId, { rejectWithValue }) => {
+export const getChannels = createAsyncThunk('channel/getChannels', async () => {
     try {
-      const response = await axios.get(`${base_url}/teamhub/channels/`, {
+      const response = await axios.get(`${base_url}/teamhub/channels`, {
         headers: {
           Authorization: `Token ${authorization}`,
         },
       });
-      return response.data;
+      const channels = response.data.results;
+      return channels;
     } catch (error) {
-      if (error.response && error.response.data) {
-        return rejectWithValue(error.response.data.message || 'Error al obtener canales');
-      }
-      return rejectWithValue(error.message);
+      throw new Error(error.message);
     }
-  }
-);
+  });
 
 // Creación de canales
 export const createChannel = createAsyncThunk(
