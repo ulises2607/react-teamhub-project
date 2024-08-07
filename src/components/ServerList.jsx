@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getServers } from '../store/serverSlice';
+import { getServers } from '../redux/serverSlice';
 
 const ServerList = ({ onSelectServer }) => {
   const dispatch = useDispatch();

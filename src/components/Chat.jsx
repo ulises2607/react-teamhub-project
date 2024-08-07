@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getMessages, sendMessage } from '../store/messageSlice';
+import { getMessages, sendMessage } from '../redux/messageSlice';
 
 const Chat = ({ currentChannel }) => {
   const dispatch = useDispatch();

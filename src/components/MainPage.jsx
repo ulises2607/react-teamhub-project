@@ -4,8 +4,8 @@ import ChannelList from './ChannelList';
 import Chat from './Chat';
 import Profile from './Profile';
 import { useDispatch } from 'react-redux';
-import { createChannel } from '../store/channelSlice';
-import { createServer } from '../store/serverSlice';
+import { createChannel } from '../redux/channelSlice';
+import { createServer } from '../redux/serverSlice';
 
 const MainPage = () => {
   const [currentServer, setCurrentServer] = useState(null);

@@ -15,7 +15,7 @@ export const getChannels = createAsyncThunk(
   'channels/getChannels',
   async (serverId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${base_url}/teamhub/channels/${serverId}`, {
+      const response = await axios.get(`${base_url}/teamhub/channels/`, {
         headers: {
           Authorization: `Token ${authorization}`,
         },

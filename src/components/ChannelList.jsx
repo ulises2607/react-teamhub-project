@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getChannels } from '../store/channelSlice';
+import { getChannels } from '../redux/channelSlice';
 
 const ChannelList = ({ currentServer, onSelectChannel, onCreateChannel }) => {
   const dispatch = useDispatch();
@@ -18,28 +18,27 @@ const ChannelList = ({ currentServer, onSelectChannel, onCreateChannel }) => {
   }
 
   return (
-    <div className="p-4 bg-gray-700 h-full">
-      <h2 className="text-white text-lg mb-4">Canales</h2>
-      {channels.length === 0 ? (
-        <div className="text-white mb-4">No hay canales disponibles</div>
-      ) : (
-        <ul>
-          {channels.map((channel) => (
-            <li
-              key={channel.id}
-              className="mb-2 text-white cursor-pointer"
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Channels</h2>
+      {channelsState.isLoading && <p>Loading...</p>}
+      {channelsState.errors && <p className="text-red-500">{channelsState.errors}</p>}
+      <ul className="list-none pl-0">
+        {channelsState.channels.map((channel) => (
+          <li key={channel.id} className="mb-2">
+            <button
               onClick={() => onSelectChannel(channel.id)}
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-900 hover:text-white"
             >
               {channel.name}
-            </li>
-          ))}
-        </ul>
-      )}
+            </button>
+          </li>
+        ))}
+      </ul>
       <button
         onClick={onCreateChannel}
         className="mt-4 p-2 bg-blue-500 rounded text-white"
       >
-        Crear canal
+        Create Channel
       </button>
     </div>
   );
