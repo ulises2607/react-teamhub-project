@@ -46,11 +46,11 @@ const LoginForm = () => {
                   />
                 </svg>
                 <input
-                  id="email"
+                  id="username"
                   className="pl-2 w-full outline-none border-none"
-                  type="email"
-                  name="email"
-                  placeholder="Email Address"
+                  type="text"
+                  name="username"
+                  placeholder="Username (Document ID)"
                 />
               </div>
               <div className="flex items-center border-2 mb-12 py-2 px-3 rounded-2xl">
@@ -98,7 +98,7 @@ const LoginForm = () => {
       <style jsx>{`
         .login_img_section {
           background: linear-gradient(rgba(2, 2, 2, 0.7), rgba(0, 0, 0, 0.7)),
-            url(https://images.unsplash.com/photo-1650825556125-060e52d40bd0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80)
+            url(https://i.pinimg.com/564x/68/b5/7d/68b57de7f066e628c7f2578e0fab97c3.jpg)
               center center;
         }
       `}</style>
