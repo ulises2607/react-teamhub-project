@@ -1,4 +1,3 @@
-// src/components/Chat.jsx
 import React, { useState, useEffect } from 'react';
 
 const Chat = ({ currentChannel }) => {
@@ -6,10 +5,10 @@ const Chat = ({ currentChannel }) => {
   const [newMessage, setNewMessage] = useState('');
 
   useEffect(() => {
-    // Recuperar mensajes de la API para el canal actual
+    // Aqui se enviarian los messages
     const fetchMessages = async () => {
       try {
-        const response = await fetch(`https://sandbox.academiadevelopers.com/channels/${currentChannel}/messages`);
+        const response = await fetch(`https://api.com`);
         const data = await response.json();
         setMessages(data);
       } catch (error) {
@@ -24,9 +23,9 @@ const Chat = ({ currentChannel }) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
 
-    // Enviar el nuevo mensaje a la API
+    // Aquí iría la lógica de envío de mensaje real
     try {
-      const response = await fetch(`https://sandbox.academiadevelopers.com/channels/${currentChannel}/messages`, {
+      const response = await fetch(`https://api.com`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

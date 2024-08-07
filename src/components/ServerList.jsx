@@ -6,7 +6,7 @@ const ServerList = ({ onSelectServer }) => {
   useEffect(() => {
     const fetchServers = async () => {
       try {
-        const response = await fetch('https://sandbox.academiadevelopers.com/servers');
+        const response = await fetch('https://api/');
         const data = await response.json();
         setServers(data);
       } catch (error) {
