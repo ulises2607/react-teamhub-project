@@ -1,15 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getServers, createServer } from "../../redux/server/serverSlice";
+import { useNavigate } from "react-router-dom";
 
 const ServerList = () => {
   const dispatch = useDispatch();
   const serversState = useSelector((state) => state.servers);
+  const auth = useSelector((state) => state.auth.token);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     icon: null,
   });
+  const navigate = useNavigate();
 
   const nameRef = useRef();
   const descriptionRef = useRef();
@@ -20,6 +23,7 @@ const ServerList = () => {
   }, [dispatch]);
 
   console.log("Servers: ", serversState.servers);
+  console.log("El token de la auth en el server component: ", auth);
 
   const handleSubmit = (e) => {
     e.preventDefault();
