@@ -1,6 +1,29 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../../../redux/auth/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
+  const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+
+  console.log("Lo que hay en el auth: ", auth);
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+
+    const username = formData.get("username");
+    const password = formData.get("password");
+
+    dispatch(login({ username, password }));
+  };
+
+  if (auth.token !== null) {
+    navigate("/servers");
+  }
+
   return (
     <div className="w-full h-screen">
       <div className="h-full flex ">
@@ -23,7 +46,10 @@ const LoginForm = () => {
         </div>
         <div className="flex w-full lg:w-1/2 justify-center items-center bg-white space-y-8">
           <div className="w-full px-8 md:px-32 lg:px-24">
-            <form className="bg-white rounded-md shadow-2xl p-5">
+            <form
+              onSubmit={handleSubmit}
+              className="bg-white rounded-md shadow-2xl p-5"
+            >
               <h1 className="text-gray-800 font-bold text-2xl mb-1">
                 Hello Again!
               </h1>
@@ -46,11 +72,11 @@ const LoginForm = () => {
                   />
                 </svg>
                 <input
-                  id="email"
+                  id="username"
                   className="pl-2 w-full outline-none border-none"
-                  type="email"
-                  name="email"
-                  placeholder="Email Address"
+                  type="text"
+                  name="username"
+                  placeholder="Username (Document ID)"
                 />
               </div>
               <div className="flex items-center border-2 mb-12 py-2 px-3 rounded-2xl">
@@ -98,7 +124,7 @@ const LoginForm = () => {
       <style jsx>{`
         .login_img_section {
           background: linear-gradient(rgba(2, 2, 2, 0.7), rgba(0, 0, 0, 0.7)),
-            url(https://images.unsplash.com/photo-1650825556125-060e52d40bd0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80)
+            url(https://i.pinimg.com/564x/68/b5/7d/68b57de7f066e628c7f2578e0fab97c3.jpg)
               center center;
         }
       `}</style>
