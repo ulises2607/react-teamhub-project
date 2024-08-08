@@ -21,7 +21,7 @@ const LoginForm = () => {
   };
 
   if (auth.token !== null) {
-    navigate("/servers");
+    navigate("/main");
   }
 
   return (
