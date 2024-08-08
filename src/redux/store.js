@@ -1,9 +1,15 @@
-import { configureStore } from "@reduxjs/toolkit";
-import serverReducer from "./server/serverSlice";
+import { configureStore } from '@reduxjs/toolkit';
+import serversReducer from './serverSlice';
+import messagesReducer from './messageSlice';
+import channelsReducer from './channelSlice';
+import messageReducer from "./messageSlice";
 
-const store = configureStore({
+export const store = configureStore({
   reducer: {
-    servers: serverReducer,
+    servers: serversReducer,
+    messages: messagesReducer,
+    channels: channelsReducer,
+    messages: messageReducer,
   },
 });
 
