@@ -12,26 +12,58 @@ const initialState = {
 
 // Obtención de canales
 export const getChannels = createAsyncThunk('channel/getChannels', async () => {
-    try {
-      const response = await axios.get(`${base_url}/teamhub/channels`, {
-        headers: {
-          Authorization: `Token ${authorization}`,
-        },
-      });
-      const channels = response.data.results;
-      return channels;
-    } catch (error) {
-      throw new Error(error.message);
-    }
-  });
+  try {
+    const response = await axios.get(`${base_url}/teamhub/channels`, {
+      headers: {
+        Authorization: `Token ${authorization}`,
+      },
+    });
+    const channels = response.data.results;
+    return channels;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+});
 
 // Creación de canales
 export const createChannel = createAsyncThunk(
   'channels/createChannel',
-  async ({ serverId, name }, { rejectWithValue }) => {
+  async ({ server, name }, { rejectWithValue }) => {
     try {
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('server', server);
+
       const response = await axios.post(
-        `${base_url}/teamhub/channels/${serverId}`,
+        `${base_url}/teamhub/channels`,
+        formData,
+        {
+          headers: {
+            Authorization: `Token ${authorization}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      if (error.response && error.response.data) {
+        return rejectWithValue(
+          error.response.data.message || 'Failed to create channel'
+        );
+      }
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Actualización de canales
+export const updateChannel = createAsyncThunk(
+  'channels/updateChannel',
+  async ({ id, name }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `${base_url}/teamhub/channels/${id}`,
         { name },
         {
           headers: {
@@ -43,7 +75,31 @@ export const createChannel = createAsyncThunk(
       return response.data;
     } catch (error) {
       if (error.response && error.response.data) {
-        return rejectWithValue(error.response.data.message || 'Error al crear canal');
+        return rejectWithValue(
+          error.response.data.message || 'Failed to update channel'
+        );
+      }
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Eliminación de canales
+export const deleteChannel = createAsyncThunk(
+  'channels/deleteChannel',
+  async (id, { rejectWithValue }) => {
+    try {
+      await axios.delete(`${base_url}/teamhub/channels/${id}`, {
+        headers: {
+          Authorization: `Token ${authorization}`,
+        },
+      });
+      return id;
+    } catch (error) {
+      if (error.response && error.response.data) {
+        return rejectWithValue(
+          error.response.data.message || 'Failed to delete channel'
+        );
       }
       return rejectWithValue(error.message);
     }
@@ -75,6 +131,35 @@ const channelsSlice = createSlice({
         state.channels.push(action.payload);
       })
       .addCase(createChannel.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errors = action.payload;
+      })
+      .addCase(updateChannel.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(updateChannel.fulfilled, (state, action) => {
+        state.isLoading = false;
+        const index = state.channels.findIndex(
+          (channel) => channel.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.channels[index] = action.payload;
+        }
+      })
+      .addCase(updateChannel.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errors = action.payload;
+      })
+      .addCase(deleteChannel.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(deleteChannel.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.channels = state.channels.filter(
+          (channel) => channel.id !== action.payload
+        );
+      })
+      .addCase(deleteChannel.rejected, (state, action) => {
         state.isLoading = false;
         state.errors = action.payload;
       });
