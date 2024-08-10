@@ -27,35 +27,35 @@ export const getChannels = createAsyncThunk('channel/getChannels', async () => {
 
 // Creación de canales
 export const createChannel = createAsyncThunk(
-  'channels/createChannel',
-  async ({ server, name }, { rejectWithValue }) => {
-    try {
-      const formData = new FormData();
-      formData.append('name', name);
-      formData.append('server', server);
-
-      const response = await axios.post(
-        `${base_url}/teamhub/channels`,
-        formData,
-        {
-          headers: {
-            Authorization: `Token ${authorization}`,
-            'Content-Type': 'multipart/form-data',
+    'channels/createChannel',
+    async ({ server, name }, { rejectWithValue }) => {
+      try {
+        const response = await axios.post(
+          `${base_url}teamhub/channels/`,
+          {
+            name: name,  // Aquí enviamos el nombre como string
+            server: server,  // Aquí enviamos el ID del servidor como entero
           },
-        }
-      );
-
-      return response.data;
-    } catch (error) {
-      if (error.response && error.response.data) {
-        return rejectWithValue(
-          error.response.data.message || 'Failed to create channel'
+          {
+            headers: {
+              Authorization: `Token ${authorization}`,
+              'Content-Type': 'application/json',  // Cambiamos el tipo de contenido a JSON
+            },
+          }
         );
+  
+        return response.data;
+      } catch (error) {
+        if (error.response && error.response.data) {
+          return rejectWithValue(
+            error.response.data.message || 'Failed to create channel'
+          );
+        }
+        return rejectWithValue(error.message);
       }
-      return rejectWithValue(error.message);
     }
-  }
 );
+  
 
 // Actualización de canales
 export const updateChannel = createAsyncThunk(

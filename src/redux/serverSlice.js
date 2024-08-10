@@ -23,7 +23,7 @@ export const createServer = createAsyncThunk(
       formData.append("icon", serverData.icon);
 
       const response = await axios.post(
-        `${base_url}/teamhub/servers`,
+        `${base_url}teamhub/servers/`,
         formData,
         {
           headers: {
