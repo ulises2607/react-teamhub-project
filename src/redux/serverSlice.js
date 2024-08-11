@@ -16,7 +16,7 @@ export const createServer = createAsyncThunk(
   "server/createServer",
   async (serverData, { rejectWithValue }) => {
     try {
-      authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
+      const authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
       const formData = new FormData();
       formData.append("name", serverData.name);
       formData.append("description", serverData.description);
@@ -57,7 +57,7 @@ export const getServers = createAsyncThunk(
             ?.replace(/(^"|"$)/g, "")}`,
         },
       });
-
+      console.log(response.data.results);
       return response.data.results;
     } catch (error) {
       if (error.response && error.response.data) {
@@ -69,6 +69,52 @@ export const getServers = createAsyncThunk(
     }
   }
 );
+
+// Explorar servidores
+export const exploreServers = createAsyncThunk(
+    "server/exploreServers",
+    async (queryParams, { rejectWithValue }) => {
+      try {
+        const authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
+        const response = await axios.get(`${base_url}/teamhub/servers/`, {
+          headers: {
+            Authorization: `Token ${authorization}`,
+          },
+          params: queryParams,
+        });
+        return response.data.results;
+      } catch (error) {
+        if (error.response && error.response.data) {
+          return rejectWithValue(
+            error.response.data.message || "Error al explorar servidores"
+          );
+        }
+        return rejectWithValue(error.message);
+      }
+    }
+  );
+  
+  // Unirse a un servidor
+  export const joinServer = createAsyncThunk(
+    "servers/joinServer",
+    async (serverId, { rejectWithValue }) => {
+      try {
+        const authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
+        const response = await axios.post(
+          `${base_url}/teamhub/members/${serverId}/`,
+          {},
+          {
+            headers: {
+              Authorization: `Token ${authorization}`,
+            },
+          }
+        );
+        return response.data;
+      } catch (error) {
+        return rejectWithValue(error.response?.data || error.message);
+      }
+    }
+  );
 
 const serversSlice = createSlice({
   name: "servers",
@@ -103,6 +149,27 @@ const serversSlice = createSlice({
         state.servers.push(action.payload);
       })
       .addCase(createServer.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errors = action.payload;
+      })
+      .addCase(joinServer.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(joinServer.fulfilled, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(joinServer.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errors = action.payload;
+      })
+      .addCase(exploreServers.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(exploreServers.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.servers = action.payload;
+      })
+      .addCase(exploreServers.rejected, (state, action) => {
         state.isLoading = false;
         state.errors = action.payload;
       });

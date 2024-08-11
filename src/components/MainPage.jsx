@@ -8,6 +8,7 @@ import { createChannel } from "../redux/channelSlice";
 import { createServer, getServers } from "../redux/serverSlice";
 import ServerForm from "./ui/ServerForm";
 import { fetchProfile } from "../redux/profileSlice";
+import { useNavigate } from "react-router-dom";
 
 const MainPage = () => {
   const [currentServer, setCurrentServer] = useState(null);
@@ -15,6 +16,7 @@ const MainPage = () => {
   const [showServerForm, setShowServerForm] = useState(false);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(getServers());
@@ -46,6 +48,10 @@ const MainPage = () => {
     setShowServerForm(false);
   };
 
+  const handleExploreServers = () => {
+    navigate('/explore-servers');
+  };
+
   return (
     <div className="flex h-screen flex-col">
       <div className="flex flex-grow">
@@ -57,6 +63,12 @@ const MainPage = () => {
               className="mt-4 p-2 bg-blue-500 rounded text-white mx-4"
             >
               Crear Servidor
+            </button>
+            <button
+              onClick={handleExploreServers}
+              className="mt-4 p-2 bg-green-500 rounded text-white mx-4"
+            >
+              Explorar Servidores
             </button>
           </div>
           <div className="p-4">
