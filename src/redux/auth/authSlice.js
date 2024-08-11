@@ -28,15 +28,17 @@ export const login = createAsyncThunk(
   }
 );
 
-export const logout = () => {
-  localStorage.removeItem("tokennn");
-  return { message: "Logged out successfully." };
-};
-
 const auhtSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: { logout },
+  reducers: {
+    logout: (state) => {
+      localStorage.removeItem("tokennn");
+      state.token = null;
+      state.isLoading = false;
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(login.pending, (state) => {
@@ -48,5 +50,7 @@ const auhtSlice = createSlice({
       });
   },
 });
+
+export const { logout } = auhtSlice.actions;
 
 export default auhtSlice.reducer;

@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const base_url = import.meta.env.VITE_API_URL;
-const authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
+let authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
 
 console.log("El Token obtenido en el serverslice: ", authorization);
 
@@ -25,7 +25,7 @@ export const createServer = createAsyncThunk(
       formData.append("icon", serverData.icon);
 
       const response = await axios.post(
-        `${base_url}teamhub/servers/`,
+        `${base_url}/teamhub/servers/`,
         formData,
         {
           headers: {
@@ -66,7 +66,15 @@ export const getServers = createAsyncThunk("server/getServers", async () => {
 export const serversSlice = createSlice({
   name: "servers",
   initialState,
-  reducers: {},
+  reducers: {
+    clearServers: (state) => {
+      state.servers = null;
+      state.isLoading = false;
+      state.errors = null;
+      state.messages = null;
+      authorization = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getServers.pending, (state) => {
@@ -93,5 +101,7 @@ export const serversSlice = createSlice({
       });
   },
 });
+
+export const { clearServers } = serversSlice.actions;
 
 export default serversSlice.reducer;

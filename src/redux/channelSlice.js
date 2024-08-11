@@ -108,7 +108,13 @@ export const deleteChannel = createAsyncThunk(
 const channelsSlice = createSlice({
   name: "channels",
   initialState,
-  reducers: {},
+  reducers: {
+    clearChannels: (state) => {
+      state.data = null;
+      state.isLoading = false;
+      state.errors = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getChannels.pending, (state) => {
@@ -164,5 +170,7 @@ const channelsSlice = createSlice({
       });
   },
 });
+
+export const { clearChannels } = channelsSlice.actions;
 
 export default channelsSlice.reducer;

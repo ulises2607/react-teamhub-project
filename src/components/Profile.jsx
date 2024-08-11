@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllProfiles, fetchProfile } from "../redux/profileSlice";
+import { clearProfile, fetchProfile } from "../redux/profileSlice";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../redux/auth/authSlice";
+import { clearMessages } from "../redux/messageSlice";
+import { clearChannels } from "../redux/channelSlice";
+import { clearServers } from "../redux/serverSlice";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -10,6 +13,8 @@ const Profile = () => {
   const [isOpen, setIsOpen] = useState(false);
   const profile = useSelector((state) => state.profile.data);
   const token = useSelector((state) => state.auth.token);
+
+  console.log("Perfil cargado en base a tokken: ", profile);
 
   useEffect(() => {
     if (token) {
@@ -24,8 +29,11 @@ const Profile = () => {
 
   const handleLogout = () => {
     console.log("Cerrando sesión");
-    dispatch(logout);
-
+    dispatch(logout());
+    dispatch(clearProfile());
+    dispatch(clearMessages());
+    dispatch(clearChannels());
+    dispatch(clearServers());
     navigate("/login");
   };
 

@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import ServerList from './ServerList';
-import ChannelList from './ChannelList';
-import Chat from './Chat';
-import Profile from './Profile';
-import { useDispatch } from 'react-redux';
-import { createChannel } from '../redux/channelSlice';
-import { createServer } from '../redux/serverSlice';
+import React, { useEffect, useState } from "react";
+import ServerList from "./ServerList";
+import ChannelList from "./ChannelList";
+import Chat from "./Chat";
+import Profile from "./Profile";
+import { useDispatch } from "react-redux";
+import { createChannel } from "../redux/channelSlice";
+import { createServer, getServers } from "../redux/serverSlice";
 
 const ServerForm = ({ onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
+    name: "",
+    description: "",
     icon: null,
   });
 
@@ -35,7 +35,9 @@ const ServerForm = ({ onClose, onSubmit }) => {
     <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
       <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-lg">
         <div className="mb-2">
-          <label className="block text-sm font-medium text-gray-700">Nombre</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Nombre
+          </label>
           <input
             type="text"
             name="name"
@@ -46,7 +48,9 @@ const ServerForm = ({ onClose, onSubmit }) => {
           />
         </div>
         <div className="mb-2">
-          <label className="block text-sm font-medium text-gray-700">Descripción</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Descripción
+          </label>
           <textarea
             name="description"
             value={formData.description}
@@ -55,7 +59,9 @@ const ServerForm = ({ onClose, onSubmit }) => {
           />
         </div>
         <div className="mb-2">
-          <label className="block text-sm font-medium text-gray-700">Icono</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Icono
+          </label>
           <input
             type="file"
             name="icon"
@@ -113,6 +119,10 @@ const MainPage = () => {
     setShowServerForm(false);
   };
 
+  useEffect(() => {
+    dispatch(getServers());
+  }, [dispatch]);
+
   return (
     <div className="flex h-screen flex-col">
       <div className="flex flex-grow">
@@ -130,7 +140,7 @@ const MainPage = () => {
             <Profile />
           </div>
         </div>
-        
+
         <div className="w-1/5 bg-gray-800">
           {currentServer ? (
             <ChannelList
@@ -140,13 +150,18 @@ const MainPage = () => {
             />
           ) : (
             <div className="flex items-center justify-center h-full">
-              <span className="text-white">Selecciona un servidor para ver sus canales</span>
+              <span className="text-white">
+                Selecciona un servidor para ver sus canales
+              </span>
             </div>
           )}
         </div>
         <div className="flex-grow bg-gray-600 relative">
           {showServerForm && (
-            <ServerForm onSubmit={handleServerFormSubmit} onClose={() => setShowServerForm(false)} />
+            <ServerForm
+              onSubmit={handleServerFormSubmit}
+              onClose={() => setShowServerForm(false)}
+            />
           )}
           {currentChannel ? (
             <Chat currentChannel={currentChannel} />
