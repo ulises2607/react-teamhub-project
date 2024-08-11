@@ -8,8 +8,6 @@ const LoginForm = () => {
   const auth = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
-  console.log("Lo que hay en el auth: ", auth);
-
   const handleSubmit = (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);

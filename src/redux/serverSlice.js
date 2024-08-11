@@ -38,7 +38,7 @@ export const createServer = createAsyncThunk(
     } catch (error) {
       if (error.response && error.response.data) {
         return rejectWithValue(
-          error.response.data.message || "Failed to create server"
+          error.response.data.message || "Error al crear servidor"
         );
       }
       return rejectWithValue(error.message);
@@ -65,10 +65,12 @@ export const getServers = createAsyncThunk(
         });
   
         const servers = response.data.results;
+        console.log("Todos los servidores:",servers);
   
         const userServers = servers.filter((server) =>
-          server.members.includes(userId)
+          server.members.includes(userId) || server.owner==userId
         );
+        console.log("Servidores filtrados:",userServers);
   
         return userServers;
       } catch (error) {
