@@ -12,6 +12,8 @@ import { useNavigate } from "react-router-dom";
 
 const MainPage = () => {
   const [currentServer, setCurrentServer] = useState(null);
+  const [serverName, setServerName] = useState("");
+  const [channelName, setChannelName] = useState("");
   const [currentChannel, setCurrentChannel] = useState(null);
   const [showServerForm, setShowServerForm] = useState(false);
 
@@ -23,13 +25,15 @@ const MainPage = () => {
     dispatch(fetchProfile());
   }, [dispatch]);
 
-  const handleSelectServer = (serverId) => {
+  const handleSelectServer = (serverId, serName) => {
     setCurrentServer(serverId);
     setCurrentChannel(null);
+    setServerName(serName);
   };
 
-  const handleSelectChannel = (channelId) => {
+  const handleSelectChannel = (channelId, channName) => {
     setCurrentChannel(channelId);
+    setChannelName(channName);
   };
 
   const handleCreateChannel = () => {
@@ -55,14 +59,22 @@ const MainPage = () => {
   return (
     <div className="flex h-screen flex-col">
       <div className="flex flex-grow">
-        <div className="w-1/5 bg-gray-700 flex flex-col justify-between">
-          <div>
+        <div className="w-[100px] bg-gray-900 flex flex-col">
+          <div className="flex-grow overflow-y-auto">
             <ServerList onSelectServer={handleSelectServer} />
+          </div>
+          <div className="p-2">
             <button
               onClick={handleCreateServer}
-              className="mt-4 p-2 bg-blue-500 rounded text-white mx-4"
+              className="bg-white opacity-25 h-12 w-12 flex items-center justify-center text-black text-2xl font-semibold rounded-3xl mb-1 overflow-hidden"
             >
-              Crear Servidor
+              <svg
+                className="fill-current h-10 w-10 block"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+              >
+                <path d="M16 10c0 .553-.048 1-.601 1H11v4.399c0 .552-.447.601-1 .601-.553 0-1-.049-1-.601V11H4.601C4.049 11 4 10.553 4 10c0-.553.049-1 .601-1H9V4.601C9 4.048 9.447 4 10 4c.553 0 1 .048 1 .601V9h4.399c.553 0 .601.447.601 1z" />
+              </svg>
             </button>
             <button
               onClick={handleExploreServers}
@@ -71,17 +83,14 @@ const MainPage = () => {
               Explorar Servidores
             </button>
           </div>
-          <div className="p-4">
-            <Profile />
-          </div>
         </div>
-
         <div className="w-1/5 bg-gray-800">
           {currentServer ? (
             <ChannelList
               currentServer={currentServer}
               onSelectChannel={handleSelectChannel}
               onCreateChannel={handleCreateChannel}
+              serverName={serverName}
             />
           ) : (
             <div className="flex items-center justify-center h-full">
@@ -99,7 +108,7 @@ const MainPage = () => {
             />
           )}
           {currentChannel ? (
-            <Chat currentChannel={currentChannel} />
+            <Chat currentChannel={currentChannel} channelName={channelName} />
           ) : (
             <div className="flex items-center justify-center h-full">
               <span className="text-white">

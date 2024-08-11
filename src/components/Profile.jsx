@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { clearProfile, fetchProfile } from "../redux/profileSlice";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../redux/auth/authSlice";
-import { clearMessages } from "../redux/messageSlice";
-import { clearChannels } from "../redux/channelSlice";
-import { clearServers } from "../redux/serverSlice";
 
 const Profile = () => {
   const dispatch = useDispatch();

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import { useState } from "react";
 
 const ServerForm = ({ onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
