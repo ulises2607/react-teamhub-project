@@ -54,14 +54,12 @@ export const getMessages = createAsyncThunk(
 
       // Crear un array de IDs únicos de autores
       const authorIds = [...new Set(messages.map((msg) => msg.author))];
-      console.log("Los IDs de los autores:", authorIds);
 
       // Obtener los perfiles de los autores
       const authorProfilesMap = await fetchAuthorProfiles(
         authorIds,
         authorization
       );
-      console.log("Mapa de perfiles de autores:", authorProfilesMap);
 
       // Añadir los perfiles de los autores a los mensajes
       const messagesWithAuthors = messages.map((msg) => ({

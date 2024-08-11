@@ -18,7 +18,6 @@ export const login = createAsyncThunk(
       );
       const token = response.data.token;
       localStorage.setItem("tokennn", JSON.stringify(token));
-      console.log("Para el localstorage: ", JSON.stringify(token));
 
       return token;
     } catch (error) {

@@ -4,8 +4,6 @@ import axios from "axios";
 const base_url = import.meta.env.VITE_API_URL;
 const authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
 
-console.log("El Token obtenido en el serverslice: ", authorization);
-
 // Estado inicial de los servers
 const initialState = {
   servers: [],
@@ -49,19 +47,35 @@ export const createServer = createAsyncThunk(
 );
 
 // Obtención de servidores
-export const getServers = createAsyncThunk("server/getServers", async () => {
-  try {
-    const response = await axios.get(`${base_url}/teamhub/servers`, {
-      headers: {
-        Authorization: `Token ${authorization}`,
-      },
-    });
-    const servers = response.data.results;
-    return servers;
-  } catch (error) {
-    throw new Error(error.message);
-  }
-});
+export const getServers = createAsyncThunk(
+    "server/getServers",
+    async (_, { getState }) => {
+      try {
+        const profile = getState().profile.data;
+  
+        if (!profile) {
+          throw new Error("Datos de perfil no encontrados");
+        }
+  
+        const userId = profile.user__id;
+        const response = await axios.get(`${base_url}/teamhub/servers`, {
+          headers: {
+            Authorization: `Token ${authorization}`,
+          },
+        });
+  
+        const servers = response.data.results;
+  
+        const userServers = servers.filter((server) =>
+          server.members.includes(userId)
+        );
+  
+        return userServers;
+      } catch (error) {
+        throw new Error(error.message);
+      }
+    }
+);
 
 export const serversSlice = createSlice({
   name: "servers",
