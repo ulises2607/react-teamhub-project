@@ -115,19 +115,22 @@ const MainPage = () => {
 
   return (
     <div className="flex h-screen flex-col">
-      <div className="flex-shrink-0 bg-gray-800">
-        <Profile />
-      </div>
       <div className="flex flex-grow">
-        <div className="w-1/5 bg-gray-700 flex flex-col">
-          <ServerList onSelectServer={handleSelectServer} />
-          <button
-            onClick={handleCreateServer}
-            className="mt-4 p-2 bg-blue-500 rounded text-white mx-4"
-          >
-            Crear Servidor
-          </button>
+        <div className="w-1/5 bg-gray-700 flex flex-col justify-between">
+          <div>
+            <ServerList onSelectServer={handleSelectServer} />
+            <button
+              onClick={handleCreateServer}
+              className="mt-4 p-2 bg-blue-500 rounded text-white mx-4"
+            >
+              Crear Servidor
+            </button>
+          </div>
+          <div className="p-4">
+            <Profile />
+          </div>
         </div>
+        
         <div className="w-1/5 bg-gray-800">
           {currentServer ? (
             <ChannelList
