@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { deleteMessage, getMessages, sendMessage } from "../redux/messageSlice";
 import MessageCard from "./ui/MessageCard";
 
-const Chat = ({ currentChannel }) => {
+const Chat = ({ currentChannel, channelName }) => {
   const dispatch = useDispatch();
   const messagesState = useSelector((state) => state.messages);
   const [newMessage, setNewMessage] = useState("");
@@ -31,8 +31,12 @@ const Chat = ({ currentChannel }) => {
   };
 
   return (
-    <div className="w-full flexflex-col h-screen bg-gray-700">
-      <div className="flex-grow p-4 overflow-y-auto">
+    <div className="w-full flexflex-col h-screen bg-[#313338]">
+      <div className="flex gap-2 items-center p-3">
+        <span className="text-[#424753] text-2xl">#</span>
+        <p className="text-white">{channelName}</p>
+      </div>
+      <div className="flex-grow p-4 overflow-y-auto max-h-[70dvh]">
         {messagesState.isLoading ? (
           <p className="text-white">Cargando...</p>
         ) : messagesState.errors ? (

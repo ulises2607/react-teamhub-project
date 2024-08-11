@@ -12,6 +12,7 @@ import { fetchProfile } from "../redux/profileSlice";
 const MainPage = () => {
   const [currentServer, setCurrentServer] = useState(null);
   const [serverName, setServerName] = useState("");
+  const [channelName, setChannelName] = useState("");
   const [currentChannel, setCurrentChannel] = useState(null);
   const [showServerForm, setShowServerForm] = useState(false);
 
@@ -28,8 +29,9 @@ const MainPage = () => {
     setServerName(serName);
   };
 
-  const handleSelectChannel = (channelId) => {
+  const handleSelectChannel = (channelId, channName) => {
     setCurrentChannel(channelId);
+    setChannelName(channName);
   };
 
   const handleCreateChannel = () => {
@@ -94,7 +96,7 @@ const MainPage = () => {
             />
           )}
           {currentChannel ? (
-            <Chat currentChannel={currentChannel} />
+            <Chat currentChannel={currentChannel} channelName={channelName} />
           ) : (
             <div className="flex items-center justify-center h-full">
               <span className="text-white">

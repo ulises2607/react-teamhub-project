@@ -54,7 +54,7 @@ const ChannelList = ({ currentServer, onSelectChannel, serverName }) => {
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto bg-transparent">
+      <div className="flex-1 overflow-y-auto bg-[#2b2d31]">
         {channelsState.isLoading && (
           <p className="text-white p-4">Cargando...</p>
         )}
@@ -66,11 +66,11 @@ const ChannelList = ({ currentServer, onSelectChannel, serverName }) => {
             {filteredChannels.map((channel) => (
               <li
                 key={channel.id}
-                className="flex items-center justify-between mb-2 bg-gray-600 hover:bg-gray-500 rounded"
+                className="flex items-center justify-between mb-2 bg-tr rounded"
               >
                 <button
-                  onClick={() => onSelectChannel(channel.id)}
-                  className="w-full text-left px-4 py-2 text-sm text-white"
+                  onClick={() => onSelectChannel(channel.id, channel.name)}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:text-white"
                 >
                   #{channel.name}
                 </button>
