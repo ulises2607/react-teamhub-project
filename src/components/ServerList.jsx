@@ -30,17 +30,19 @@ const ServerList = ({ onSelectServer }) => {
   );
 
   return (
-    <div className="p-4 bg-gray-700 h-full">
-      <h2 className="text-white text-lg mb-4">Servidores</h2>
+    <div className="p-4 bg-[#1e1f22] h-full">
+      <h2 className="text-white text-sm mb-4">My Servers</h2>
       <ul>
         {filteredServers && filteredServers.length > 0 ? (
           filteredServers.map((server) => (
             <li
               key={server.id}
               className="mb-2 text-white cursor-pointer"
-              onClick={() => onSelectServer(server.id)}
+              onClick={() => onSelectServer(server.id, server.name)}
             >
-              {server.name}
+              <div className="bg-white h-12 w-12 flex items-center justify-center text-black text-2xl font-semibold rounded-3xl mb-1 overflow-hidden">
+                <img src={server.icon} alt="server-icon" className="" />
+              </div>
             </li>
           ))
         ) : (
