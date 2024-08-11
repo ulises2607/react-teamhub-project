@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const base_url = import.meta.env.VITE_API_URL;
-const authorization = import.meta.env.VITE_AUTHORIZATION;
+const authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
 
 const initialState = {
   channels: [],

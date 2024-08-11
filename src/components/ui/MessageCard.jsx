@@ -24,14 +24,13 @@ const MessageCard = ({
             {username ? username : "Sin data"}
           </span>
           <span className="font-bold text-gray-400 text-xs ml-2">{time}</span>
-          <div>
-            <button
-              onClick={deleteMessage}
-              className="block px-4 py-2 text-sm text-red-700 hover:bg-gray-900 hover:text-white"
-            >
-              Eliminar
-            </button>
-          </div>
+
+          <button
+            onClick={deleteMessage}
+            className="px-4 py-2 text-sm text-red-700 hover:bg-gray-900 hover:text-white"
+          >
+            Eliminar
+          </button>
         </div>
         <p className="text-white leading-normal">
           {content ? content : "Sin data"}
