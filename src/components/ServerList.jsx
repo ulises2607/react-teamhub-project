@@ -9,7 +9,7 @@ const ServerList = ({ onSelectServer }) => {
   const profile = useSelector((state) => state.profile.data);
   const serversData = useSelector(servers);
 
-  console.log("Lo que trae serverData: ", serversData);
+  //console.log("Lo que trae serverData: ", serversData);
 
   useEffect(() => {
     dispatch(getServers());
