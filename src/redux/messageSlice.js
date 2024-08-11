@@ -46,6 +46,7 @@ export const getMessages = createAsyncThunk(
         },
         params: {
           channel: channelId,
+          ordering: "created_at",
         },
       });
 
