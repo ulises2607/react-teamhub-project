@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const base_url = import.meta.env.VITE_API_URL;
+let authorization = "";
 
 const initialState = {
   data: null,
@@ -12,13 +13,14 @@ const initialState = {
 // Thunk para obtener los datos del perfil
 export const fetchProfile = createAsyncThunk(
   "profile/fetchProfile",
-  async (token, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
+      authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
       const response = await axios.get(
         `${base_url}/users/profiles/profile_data/`,
         {
           headers: {
-            Authorization: `Token ${token}`,
+            Authorization: `Token ${authorization}`,
           },
         }
       );
@@ -34,14 +36,15 @@ export const fetchProfile = createAsyncThunk(
 // Thunk para actualizar el perfil
 export const updateProfile = createAsyncThunk(
   "profile/updateProfile",
-  async ({ token, profileData }, { rejectWithValue }) => {
+  async ({ profileData }, { rejectWithValue }) => {
     try {
+      authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
       const response = await axios.put(
         `${base_url}/users/profiles/profile_data/`,
         profileData,
         {
           headers: {
-            Authorization: `Token ${token}`,
+            Authorization: `Token ${authorization}`,
             "Content-Type": "application/json",
           },
         }
@@ -61,6 +64,8 @@ const profileSlice = createSlice({
       state.data = null;
       state.isLoading = false;
       state.error = null;
+      authorization = null;
+      localStorage.removeItem("tokennn");
     },
   },
   extraReducers: (builder) => {

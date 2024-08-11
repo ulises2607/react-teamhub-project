@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { clearProfile, fetchProfile } from "../redux/profileSlice";
 import { useNavigate } from "react-router-dom";
@@ -11,28 +11,18 @@ const Profile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const profile = useSelector((state) => state.profile.data);
-  const token = useSelector((state) => state.auth.token);
-
-  console.log("Perfil cargado en base a tokken: ", profile);
-
-  useEffect(() => {
-    if (token) {
-      dispatch(fetchProfile(token));
-    }
-  }, [dispatch, token]);
+  const {
+    data: profile,
+    isLoading,
+    error,
+  } = useSelector((state) => state.profile);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
   const handleLogout = () => {
-    console.log("Cerrando sesión");
     dispatch(logout());
-    dispatch(clearProfile());
-    dispatch(clearMessages());
-    dispatch(clearChannels());
-    dispatch(clearServers());
     navigate("/login");
   };
 
@@ -40,11 +30,15 @@ const Profile = () => {
     navigate("/profile");
   };
 
-  if (!profile) {
-    return <div>Cargando...</div>;
+  if (isLoading) {
+    return <div>Cargando perfil...</div>;
   }
 
-  return (
+  if (error) {
+    return <div>Error al cargar perfil: {error}</div>;
+  }
+
+  return profile ? (
     <div className="relative mt-4">
       <button onClick={toggleMenu} className="flex items-center">
         <img
@@ -53,7 +47,9 @@ const Profile = () => {
           alt="User"
         />
         <span className="ml-2 text-white">
-          {profile.first_name + " " + profile.last_name}
+          {profile.first_name && profile.last_name
+            ? `${profile.first_name} ${profile.last_name}`
+            : "Usuario"}
         </span>
       </button>
       {isOpen && (
@@ -73,7 +69,7 @@ const Profile = () => {
         </div>
       )}
     </div>
-  );
+  ) : null;
 };
 
 export default Profile;

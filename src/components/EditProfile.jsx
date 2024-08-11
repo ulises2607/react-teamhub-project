@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateProfile } from '../redux/profileSlice';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { updateProfile } from "../redux/profileSlice";
+import { useNavigate } from "react-router-dom";
 
 const EditProfile = () => {
   const dispatch = useDispatch();
@@ -10,13 +10,13 @@ const EditProfile = () => {
   const token = useSelector((state) => state.auth.token);
 
   const [formData, setFormData] = useState({
-    username: profile?.username || '',
-    first_name: profile?.first_name || '',
-    last_name: profile?.last_name || '',
-    email: profile?.email || '',
-    dob: profile?.dob || '',
-    profile_image: profile?.profile_image || '',
-    profile_state: profile?.profile_state || 'En línea', 
+    username: profile?.username || "",
+    first_name: profile?.first_name || "",
+    last_name: profile?.last_name || "",
+    email: profile?.email || "",
+    dob: profile?.dob || "",
+    profile_image: profile?.profile_image || "",
+    profile_state: profile?.profile_state || "En línea",
   });
 
   const handleChange = (e) => {
@@ -31,12 +31,12 @@ const EditProfile = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Aquí puedes manejar la carga de la imagen si es necesario
-    dispatch(updateProfile({ token, profileData: formData }));
-    navigate('/main'); // Redirige a la MainPage después de guardar los cambios
+    dispatch(updateProfile({ profileData: formData }));
+    navigate("/main"); // Redirige a la MainPage después de guardar los cambios
   };
 
   const handleCancel = () => {
-    navigate('/main'); // Redirige a la MainPage al cancelar
+    navigate("/main"); // Redirige a la MainPage al cancelar
   };
 
   return (

@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const base_url = import.meta.env.VITE_API_URL;
-const authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
+let authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
 
 const initialState = {
   channels: [],
@@ -113,6 +113,7 @@ const channelsSlice = createSlice({
       state.data = null;
       state.isLoading = false;
       state.errors = null;
+      authorization = null;
     },
   },
   extraReducers: (builder) => {

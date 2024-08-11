@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const base_url = import.meta.env.VITE_API_URL;
+const authorization = "";
 
 // Estado inicial de los servers
 const initialState = {
@@ -15,6 +16,7 @@ export const createServer = createAsyncThunk(
   "server/createServer",
   async (serverData, { rejectWithValue }) => {
     try {
+      authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
       const formData = new FormData();
       formData.append("name", serverData.name);
       formData.append("description", serverData.description);
@@ -25,7 +27,7 @@ export const createServer = createAsyncThunk(
         formData,
         {
           headers: {
-            Authorization: `Token ${localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "")}`,
+            Authorization: `Token ${authorization}`,
             "Content-Type": "multipart/form-data",
           },
         }
@@ -50,7 +52,9 @@ export const getServers = createAsyncThunk(
     try {
       const response = await axios.get(`${base_url}/teamhub/servers/`, {
         headers: {
-          Authorization: `Token ${localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "")}`,
+          Authorization: `Token ${localStorage
+            .getItem("tokennn")
+            ?.replace(/(^"|"$)/g, "")}`,
         },
       });
 
@@ -71,9 +75,11 @@ const serversSlice = createSlice({
   initialState,
   reducers: {
     clearServers: (state) => {
+      localStorage.removeItem("tokennn");
       state.servers = [];
       state.isLoading = false;
       state.errors = null;
+      authorization = null;
     },
   },
   extraReducers: (builder) => {
@@ -104,5 +110,7 @@ const serversSlice = createSlice({
 });
 
 export const { clearServers } = serversSlice.actions;
+
+export const servers = (state) => state.servers;
 
 export default serversSlice.reducer;

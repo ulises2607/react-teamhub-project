@@ -1,12 +1,15 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getServers } from "../redux/serverSlice";
+import { getServers, servers } from "../redux/serverSlice";
 
 const ServerList = ({ onSelectServer }) => {
   const dispatch = useDispatch();
-  const servers = useSelector((state) => state.servers.servers);
+
   const isLoading = useSelector((state) => state.servers.isLoading);
   const profile = useSelector((state) => state.profile.data);
+  const serversData = useSelector(servers);
+
+  console.log("Lo que trae serverData: ", serversData);
 
   useEffect(() => {
     dispatch(getServers());
@@ -20,7 +23,7 @@ const ServerList = ({ onSelectServer }) => {
     return <div>No se pudo cargar el perfil</div>;
   }
 
-  const filteredServers = servers?.filter(
+  const filteredServers = serversData?.servers.filter(
     (server) =>
       server.members.includes(profile.user__id) ||
       server.owner === profile.user__id
