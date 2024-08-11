@@ -1,6 +1,12 @@
 import React from "react";
 
-const MessageCard = ({ username, userImage, content, time = null }) => {
+const MessageCard = ({
+  username,
+  userImage,
+  content,
+  time = null,
+  deleteMessage,
+}) => {
   return (
     <div className="border-b border-gray-600 py-3 flex items-start mb-4 text-sm">
       <img
@@ -18,6 +24,14 @@ const MessageCard = ({ username, userImage, content, time = null }) => {
             {username ? username : "Sin data"}
           </span>
           <span className="font-bold text-gray-400 text-xs ml-2">{time}</span>
+          <div>
+            <button
+              onClick={deleteMessage}
+              className="block px-4 py-2 text-sm text-red-700 hover:bg-gray-900 hover:text-white"
+            >
+              Eliminar
+            </button>
+          </div>
         </div>
         <p className="text-white leading-normal">
           {content ? content : "Sin data"}

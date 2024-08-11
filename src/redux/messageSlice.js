@@ -126,6 +126,29 @@ export const sendMessage = createAsyncThunk(
   }
 );
 
+export const deleteMessage = createAsyncThunk(
+  "messages/deleteMessage",
+  async (messageId, { rejectWithValue }) => {
+    try {
+      // Realizar la solicitud DELETE para eliminar el mensaje
+      await axios.delete(`${base_url}/teamhub/messages/${messageId}/`, {
+        headers: {
+          Authorization: `Token ${authorization}`,
+        },
+      });
+
+      return messageId; // Retornamos el id del mensaje eliminado por si se usa despues
+    } catch (error) {
+      if (error.response && error.response.data) {
+        return rejectWithValue(
+          error.response.data.message || "Failed to delete message"
+        );
+      }
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const messageSlice = createSlice({
   name: "messages",
   initialState,
@@ -151,6 +174,19 @@ const messageSlice = createSlice({
         state.messages.push(action.payload);
       })
       .addCase(sendMessage.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errors = action.payload;
+      })
+      .addCase(deleteMessage.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(deleteMessage.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.messages = state.messages.filter(
+          (message) => message.id !== action.payload
+        );
+      })
+      .addCase(deleteMessage.rejected, (state, action) => {
         state.isLoading = false;
         state.errors = action.payload;
       });

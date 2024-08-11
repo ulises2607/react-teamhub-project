@@ -16,7 +16,7 @@ export const login = createAsyncThunk(
         `${import.meta.env.VITE_API_URL}/api-auth/`,
         credentials
       );
-      const token = response.data.token; // Accede a los datos de la respuesta directamente
+      const token = response.data.token;
       localStorage.setItem("tokennn", JSON.stringify(token));
       console.log("Para el localstorage: ", JSON.stringify(token));
 

@@ -1,31 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getMessages, sendMessage } from "../redux/messageSlice";
+import { deleteMessage, getMessages, sendMessage } from "../redux/messageSlice";
 import MessageCard from "./ui/MessageCard";
 
 const Chat = ({ currentChannel }) => {
   const dispatch = useDispatch();
   const messagesState = useSelector((state) => state.messages);
-  const allProfiles = useSelector((state) => state.profile.allProfiles);
   const [newMessage, setNewMessage] = useState("");
-  const [filtrado, setFiltrado] = useState(null);
-
-  console.log("La estructura de los mensajes: ", messagesState);
-
-  // const messageFormater = (allProfiles) => {
-  //   allProfiles.results.map((user) => user.user__id === 214);
-  //   console.log(
-  //     "El filtrado: ",
-  //     allProfiles.results.map((user) => user.user__id === 214)
-  //   );
-  // };
 
   useEffect(() => {
     if (currentChannel) {
       dispatch(getMessages(currentChannel));
-      // if (allProfiles) {
-      //   messageFormater(allProfiles);
-      // }
     }
   }, [currentChannel, dispatch]);
 
@@ -41,6 +26,10 @@ const Chat = ({ currentChannel }) => {
     }
   };
 
+  const handleDeleteMessage = (id) => {
+    dispatch(deleteMessage(id));
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex-grow p-4 overflow-y-auto bg-gray-600">
@@ -51,15 +40,13 @@ const Chat = ({ currentChannel }) => {
         ) : (
           <div>
             {messagesState.messages.map((message) => (
-              // <div key={message.id} className="mb-2 p-2 bg-gray-800 rounded">
-              //   <p className="text-white">{message.content}</p>
-              // </div>
               <MessageCard
                 key={message.id}
-                username={message.authorProfile.first_name}
-                userImage={message.authorProfile.bio}
+                username={message.authorProfile?.first_name}
+                userImage={message.authorProfile?.bio}
                 content={message.content}
                 time={message.created_at}
+                deleteMessage={() => handleDeleteMessage(message.id)}
               />
             ))}
           </div>
