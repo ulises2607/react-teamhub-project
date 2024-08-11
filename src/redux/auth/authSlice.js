@@ -2,9 +2,10 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const initialState = {
-  token: null,
+  token: JSON.parse(localStorage.getItem("tokennn")) || null,
   isLoading: false,
   error: null,
+  message: null,
 };
 
 export const login = createAsyncThunk(
@@ -16,6 +17,8 @@ export const login = createAsyncThunk(
         credentials
       );
       const token = response.data.token; // Accede a los datos de la respuesta directamente
+      localStorage.setItem("tokennn", JSON.stringify(token));
+      console.log("Para el localstorage: ", JSON.stringify(token));
 
       return token;
     } catch (error) {
@@ -25,15 +28,15 @@ export const login = createAsyncThunk(
   }
 );
 
+export const logout = createAsyncThunk("user/logoutUser", async () => {
+  localStorage.removeItem("tokennn");
+  return { message: "Logged out successfully." };
+});
+
 const auhtSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {
-    logout: (state) => {
-      state.token = null;
-      // localStorage.removeItem('token')
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(login.pending, (state) => {
@@ -46,9 +49,12 @@ const auhtSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false;
         state.token = action.payload;
+      })
+      .addCase(logout.fulfilled, (state, action) => {
+        state.user = null;
+        state.message = action.payload.message;
       });
   },
 });
 
-export const { logout } = auhtSlice.actions;
 export default auhtSlice.reducer;

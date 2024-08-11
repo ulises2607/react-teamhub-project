@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchProfile } from '../redux/profileSlice';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllProfiles, fetchProfile } from "../redux/profileSlice";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../redux/auth/authSlice";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -13,6 +14,7 @@ const Profile = () => {
   useEffect(() => {
     if (token) {
       dispatch(fetchProfile(token));
+      dispatch(fetchAllProfiles(token));
     }
   }, [dispatch, token]);
 
@@ -21,12 +23,14 @@ const Profile = () => {
   };
 
   const handleLogout = () => {
-    console.log('Cerrando sesión');
-    navigate('/login');
+    console.log("Cerrando sesión");
+    // dispatch(logout);
+
+    navigate("/login");
   };
 
   const handleEditProfile = () => {
-    navigate('/profile');
+    navigate("/profile");
   };
 
   if (!profile) {
@@ -41,7 +45,9 @@ const Profile = () => {
           src={profile.profile_image || "/user.png"}
           alt="User"
         />
-        <span className="ml-2 text-gray-800">{profile.first_name + ' ' + profile.last_name}</span>
+        <span className="ml-2 text-white">
+          {profile.first_name + " " + profile.last_name}
+        </span>
       </button>
       {isOpen && (
         <div className="absolute right-0 mb-2 w-48 bg-white border rounded shadow-lg bottom-full">
