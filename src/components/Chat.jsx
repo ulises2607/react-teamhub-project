@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getMessages, sendMessage } from "../redux/messageSlice";
+import MessageCard from "./ui/MessageCard";
 
 const Chat = ({ currentChannel }) => {
   const dispatch = useDispatch();
@@ -10,7 +11,6 @@ const Chat = ({ currentChannel }) => {
   const [filtrado, setFiltrado] = useState(null);
 
   console.log("La estructura de los mensajes: ", messagesState);
-  console.log("La estructura del allProfiles: ", allProfiles);
 
   // const messageFormater = (allProfiles) => {
   //   allProfiles.results.map((user) => user.user__id === 214);
@@ -51,9 +51,16 @@ const Chat = ({ currentChannel }) => {
         ) : (
           <div>
             {messagesState.messages.map((message) => (
-              <div key={message.id} className="mb-2 p-2 bg-gray-800 rounded">
-                <p className="text-white">{message.content}</p>
-              </div>
+              // <div key={message.id} className="mb-2 p-2 bg-gray-800 rounded">
+              //   <p className="text-white">{message.content}</p>
+              // </div>
+              <MessageCard
+                key={message.id}
+                username={message.authorProfile.first_name}
+                userImage={message.authorProfile.bio}
+                content={message.content}
+                time={message.created_at}
+              />
             ))}
           </div>
         )}

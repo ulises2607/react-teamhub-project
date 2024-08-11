@@ -10,31 +10,6 @@ const initialState = {
   errors: null,
 };
 
-// Obtener mensajes de un canal
-// export const getMessages = createAsyncThunk(
-//   "messages/getMessages",
-//   async (channelId, { rejectWithValue }) => {
-//     try {
-//       const response = await axios.get(`${base_url}/teamhub/messages/`, {
-//         headers: {
-//           Authorization: `Token ${authorization}`,
-//         },
-//         params: {
-//           channel: channelId,
-//         },
-//       });
-//       return response.data.results;
-//     } catch (error) {
-//       if (error.response && error.response.data) {
-//         return rejectWithValue(
-//           error.response.data.message || "Failed to fetch messages"
-//         );
-//       }
-//       return rejectWithValue(error.message);
-//     }
-//   }
-// );
-
 const fetchAuthorProfiles = async (authorIds, authorization) => {
   try {
     const authorPromises = authorIds.map((id) =>
@@ -48,14 +23,10 @@ const fetchAuthorProfiles = async (authorIds, authorization) => {
     // Espera a que todas las promesas se resuelvan
     const authorProfiles = await Promise.all(authorPromises);
 
-    console.log("La promesa de la obtecnion de datos: ", authorProfiles);
-
     // Devuelve un mapa con los perfiles de los autores por su ID
     return authorProfiles.reduce((acc, profile) => {
       const userId = profile.data.user__id;
       acc[userId] = profile.data;
-      console.log("El acumulador: ", acc);
-
       return acc;
     }, {});
   } catch (error) {
@@ -94,7 +65,7 @@ export const getMessages = createAsyncThunk(
       // Añadir los perfiles de los autores a los mensajes
       const messagesWithAuthors = messages.map((msg) => ({
         ...msg,
-        authorProfile: authorProfilesMap[msg.author],
+        authorProfile: authorProfilesMap[msg.author] || null,
       }));
 
       return messagesWithAuthors;
@@ -114,6 +85,7 @@ export const sendMessage = createAsyncThunk(
   "messages/sendMessage",
   async (messageData, { rejectWithValue }) => {
     try {
+      // Enviar el nuevo mensaje
       const response = await axios.post(
         `${base_url}/teamhub/messages/`,
         messageData,
@@ -123,7 +95,26 @@ export const sendMessage = createAsyncThunk(
           },
         }
       );
-      return response.data;
+
+      const newMessage = response.data;
+
+      // Obtener el perfil del autor del nuevo mensaje
+      const authorProfileResponse = await axios.get(
+        `${base_url}/users/profiles/${newMessage.author}/`,
+        {
+          headers: {
+            Authorization: `Token ${authorization}`,
+          },
+        }
+      );
+
+      // Agregar el perfil del autor al nuevo mensaje
+      const newMessageWithAuthorProfile = {
+        ...newMessage,
+        authorProfile: authorProfileResponse.data,
+      };
+
+      return newMessageWithAuthorProfile;
     } catch (error) {
       if (error.response && error.response.data) {
         return rejectWithValue(
