@@ -65,12 +65,12 @@ export const getServers = createAsyncThunk(
         });
   
         const servers = response.data.results;
-        console.log("Todos los servidores:",servers);
+        //console.log("Todos los servidores:",servers);
   
         const userServers = servers.filter((server) =>
           server.members.includes(userId) || server.owner==userId
         );
-        console.log("Servidores filtrados:",userServers);
+        //console.log("Servidores filtrados:",userServers);
   
         return userServers;
       } catch (error) {
