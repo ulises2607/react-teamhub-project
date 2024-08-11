@@ -16,18 +16,21 @@ const EditProfile = () => {
     email: profile?.email || '',
     dob: profile?.dob || '',
     profile_image: profile?.profile_image || '',
-    profile_state: profile?.profile_state || '',
+    profile_state: profile?.profile_state || 'En línea', 
   });
 
   const handleChange = (e) => {
+    const { name, value, files } = e.target;
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: files ? files[0] : value,
     });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Aquí puedes manejar la carga de la imagen si es necesario
     dispatch(updateProfile({ token, profileData: formData }));
     navigate('/main'); // Redirige a la MainPage después de guardar los cambios
   };
@@ -93,22 +96,27 @@ const EditProfile = () => {
         <div className="mb-4">
           <label className="block text-gray-700">Foto de Perfil:</label>
           <input
-            type="text"
+            type="file"
             name="profile_image"
-            value={formData.profile_image}
+            accept="image/*"
             onChange={handleChange}
             className="w-full px-3 py-2 border rounded"
           />
         </div>
         <div className="mb-4">
           <label className="block text-gray-700">Estado:</label>
-          <input
-            type="text"
+          <select
             name="profile_state"
             value={formData.profile_state}
             onChange={handleChange}
             className="w-full px-3 py-2 border rounded"
-          />
+          >
+            <option value="Activo">Ausente</option>
+            <option value="Inactivo">De vacaciones</option>
+            <option value="Inactivo">En una reunión</option>
+            <option value="Inactivo">Ocupado</option>
+            <option value="Inactivo">En línea</option>
+          </select>
         </div>
         <div className="flex justify-between">
           <button
