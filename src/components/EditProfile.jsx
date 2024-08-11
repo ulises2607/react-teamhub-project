@@ -30,13 +30,12 @@ const EditProfile = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Aquí puedes manejar la carga de la imagen si es necesario
     dispatch(updateProfile({ profileData: formData }));
-    navigate("/main"); // Redirige a la MainPage después de guardar los cambios
+    navigate("/main");
   };
 
   const handleCancel = () => {
-    navigate("/main"); // Redirige a la MainPage al cancelar
+    navigate("/main");
   };
 
   return (

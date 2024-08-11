@@ -38,7 +38,7 @@ export const updateProfile = createAsyncThunk(
   "profile/updateProfile",
   async ({ profileData }, { rejectWithValue }) => {
     try {
-      authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
+      const authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
       const response = await axios.put(
         `${base_url}/users/profiles/profile_data/`,
         profileData,
