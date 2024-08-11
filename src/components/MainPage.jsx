@@ -16,6 +16,11 @@ const MainPage = () => {
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    dispatch(getServers());
+    dispatch(fetchProfile());
+  }, [dispatch]);
+
   const handleSelectServer = (serverId) => {
     setCurrentServer(serverId);
     setCurrentChannel(null);
@@ -40,11 +45,6 @@ const MainPage = () => {
     dispatch(createServer(serverData));
     setShowServerForm(false);
   };
-
-  useEffect(() => {
-    dispatch(getServers());
-    dispatch(fetchProfile());
-  }, [dispatch]);
 
   return (
     <div className="flex h-screen flex-col">

@@ -8,8 +8,6 @@ const ServerList = ({ onSelectServer }) => {
   const isLoading = useSelector((state) => state.servers.isLoading);
   const profile = useSelector((state) => state.profile.data);
 
-  console.log("Servers: ", servers);
-
   useEffect(() => {
     dispatch(getServers());
   }, [dispatch]);
@@ -18,31 +16,33 @@ const ServerList = ({ onSelectServer }) => {
     return <div>Cargando servidores...</div>;
   }
 
-  console.log("Profile id en el componente: ", profile.user__id);
+  if (!profile) {
+    return <div>No se pudo cargar el perfil</div>;
+  }
 
   const filteredServers = servers?.filter(
     (server) =>
       server.members.includes(profile.user__id) ||
-      server.owner == profile.user__id
+      server.owner === profile.user__id
   );
-
-  console.log("Los servidores filtrados en el componente: ", filteredServers);
 
   return (
     <div className="p-4 bg-gray-700 h-full">
-      <h2 className="text-white text-lg mb-4">Servers</h2>
+      <h2 className="text-white text-lg mb-4">Servidores</h2>
       <ul>
-        {filteredServers
-          ? filteredServers.map((server) => (
-              <li
-                key={server.id}
-                className="mb-2 text-white cursor-pointer"
-                onClick={() => onSelectServer(server.id)}
-              >
-                {server.name}
-              </li>
-            ))
-          : null}
+        {filteredServers && filteredServers.length > 0 ? (
+          filteredServers.map((server) => (
+            <li
+              key={server.id}
+              className="mb-2 text-white cursor-pointer"
+              onClick={() => onSelectServer(server.id)}
+            >
+              {server.name}
+            </li>
+          ))
+        ) : (
+          <div className="text-white">No tienes servidores disponibles</div>
+        )}
       </ul>
     </div>
   );
