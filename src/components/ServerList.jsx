@@ -30,7 +30,7 @@ const ServerList = ({ onSelectServer }) => {
   );
 
   return (
-    <div className="p-4 bg-[#1e1f22] h-full">
+    <div className="p-4 bg-gray-900 h-full">
       <h2 className="text-white text-sm mb-4">My Servers</h2>
       <ul>
         {filteredServers && filteredServers.length > 0 ? (

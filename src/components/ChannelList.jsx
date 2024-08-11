@@ -44,7 +44,7 @@ const ChannelList = ({ currentServer, onSelectChannel, serverName }) => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between p-4 bg-[#2b2d31] text-white">
+      <div className="flex items-center justify-between p-4 bg-gray-800 text-white">
         <h2 className="text-xl font-bold">{serverName}</h2>
         <button
           onClick={handleCreateChannel}
@@ -54,7 +54,7 @@ const ChannelList = ({ currentServer, onSelectChannel, serverName }) => {
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto bg-[#2b2d31]">
+      <div className="flex-1 overflow-y-auto bg-gray-800">
         {channelsState.isLoading && (
           <p className="text-white p-4">Cargando...</p>
         )}
@@ -77,7 +77,7 @@ const ChannelList = ({ currentServer, onSelectChannel, serverName }) => {
                 <div className="relative">
                   <button
                     onClick={() => toggleMenu(channel.id)}
-                    className="px-2 text-gray-400 hover:text-white focus:outline-none"
+                    className="px-2 text-gray-400  hover:text-green-700 focus:outline-none"
                   >
                     •••
                   </button>
@@ -114,7 +114,7 @@ const ChannelList = ({ currentServer, onSelectChannel, serverName }) => {
         )}
       </div>
 
-      <div className="p-4 bg-gray-800 border-t border-gray-600">
+      <div className="px-6 py-3 max-h-[75px] bg-gray-800 border-t border-gray-600 flex items-center">
         <Profile />
       </div>
     </div>

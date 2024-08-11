@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const base_url = import.meta.env.VITE_API_URL;
-let authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
+let authorization = "";
 
 const initialState = {
   channels: [],
@@ -13,6 +13,7 @@ const initialState = {
 // Obtención de canales
 export const getChannels = createAsyncThunk("channel/getChannels", async () => {
   try {
+    authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
     const response = await axios.get(`${base_url}/teamhub/channels`, {
       headers: {
         Authorization: `Token ${authorization}`,

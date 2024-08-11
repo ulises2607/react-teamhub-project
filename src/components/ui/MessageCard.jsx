@@ -7,6 +7,11 @@ const MessageCard = ({
   time = null,
   deleteMessage,
 }) => {
+  const formatDate = (dateString) => {
+    const options = { hour: "numeric", minute: "numeric" };
+    return new Date(dateString).toLocaleTimeString([], options);
+  };
+
   return (
     <div className="flex items-start border-b border-gray-600 py-3">
       <img
@@ -20,10 +25,13 @@ const MessageCard = ({
       />
       <div className="flex-1">
         <div className="flex items-center justify-between">
-          <span className="font-semibold text-white">
+          <span className="font-semibold text-white flex gap-2 items-center">
             {username || "Sin data"}
+            {time && (
+              <span className="text-gray-400 text-xs">{formatDate(time)}</span>
+            )}
           </span>
-          {time && <span className="text-gray-400 text-xs">{time}</span>}
+
           <button
             onClick={deleteMessage}
             className="text-red-500 hover:text-red-700 text-xs"
@@ -31,7 +39,7 @@ const MessageCard = ({
             Eliminar
           </button>
         </div>
-        <p className="text-white mt-1">{content || "Sin data"}</p>
+        <p className="text-white text-sm mt-1">{content || "Sin data"}</p>
       </div>
     </div>
   );

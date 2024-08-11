@@ -35,14 +35,14 @@ const Profile = () => {
   }
 
   return profile ? (
-    <div className="relative mt-4">
+    <div className="relative my-4">
       <button onClick={toggleMenu} className="flex items-center">
         <img
           className="w-10 h-10 rounded-full"
           src={profile.profile_image || "/user.png"}
           alt="User"
         />
-        <span className="ml-2 text-white">
+        <span className="ml-2 text-white text-sm">
           {profile.first_name && profile.last_name
             ? `${profile.first_name} ${profile.last_name}`
             : "Usuario"}
