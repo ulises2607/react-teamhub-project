@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const base_url = import.meta.env.VITE_API_URL;
-const authorization = localStorage.getItem("token");
+const authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
 
 const initialState = {
   messages: [],
@@ -35,6 +35,35 @@ const initialState = {
 //   }
 // );
 
+const fetchAuthorProfiles = async (authorIds, authorization) => {
+  try {
+    const authorPromises = authorIds.map((id) =>
+      axios.get(`${base_url}/users/profiles/${id}/`, {
+        headers: {
+          Authorization: `Token ${authorization}`,
+        },
+      })
+    );
+
+    // Espera a que todas las promesas se resuelvan
+    const authorProfiles = await Promise.all(authorPromises);
+
+    console.log("La promesa de la obtecnion de datos: ", authorProfiles);
+
+    // Devuelve un mapa con los perfiles de los autores por su ID
+    return authorProfiles.reduce((acc, profile) => {
+      const userId = profile.data.user__id;
+      acc[userId] = profile.data;
+      console.log("El acumulador: ", acc);
+
+      return acc;
+    }, {});
+  } catch (error) {
+    console.error("Error fetching author profiles:", error);
+    throw new Error("Failed to fetch author profiles");
+  }
+};
+
 export const getMessages = createAsyncThunk(
   "messages/getMessages",
   async (channelId, { rejectWithValue }) => {
@@ -51,38 +80,22 @@ export const getMessages = createAsyncThunk(
 
       const messages = response.data.results;
 
-      // Se crea un array de ids únicos de autores para evitar peticiones innecesarias
+      // Crear un array de IDs únicos de autores
       const authorIds = [...new Set(messages.map((msg) => msg.author))];
+      console.log("Los IDs de los autores:", authorIds);
 
-      // Se haycen las peticiones para obtener los perfiles de los autores
-      const authorProfilesPromises = authorIds.map((id) =>
-        axios.get(`${base_url}/users/profiles/${id}/`, {
-          headers: {
-            Authorization: `Token ${authorization}`,
-          },
-        })
+      // Obtener los perfiles de los autores
+      const authorProfilesMap = await fetchAuthorProfiles(
+        authorIds,
+        authorization
       );
+      console.log("Mapa de perfiles de autores:", authorProfilesMap);
 
-      // Se esperan a que todas las peticiones hayan fiunalizado
-      const authorProfiles = await Promise.all(authorProfilesPromises);
-
-      console.log("Los authores obtenidos", authorProfiles.data);
-
-      // Mapear los perfiles de los autores por su id
-      const authorProfilesMap = authorProfiles.reduce((acc, profile) => {
-        acc[profile.data.id] = profile.data;
-        return acc;
-      }, {});
-
-      console.log("Author Profiles Map: ", authorProfilesMap.undefined);
-
-      // Añadiendoo los datos del autor a cada mensaje
+      // Añadir los perfiles de los autores a los mensajes
       const messagesWithAuthors = messages.map((msg) => ({
         ...msg,
-        authorProfile: msg.id == authorProfilesMap, // Verificar esta parte urg
+        authorProfile: authorProfilesMap[msg.author],
       }));
-
-      console.log("Messages with Authors: ", messagesWithAuthors);
 
       return messagesWithAuthors;
     } catch (error) {

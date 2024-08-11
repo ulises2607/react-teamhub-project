@@ -2,7 +2,9 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const base_url = import.meta.env.VITE_API_URL;
-const authorization = import.meta.env.VITE_AUTHORIZATION;
+const authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
+
+console.log("El Token obtenido en el serverslice: ", authorization);
 
 // Estado inicial de los servers
 const initialState = {

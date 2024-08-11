@@ -12,20 +12,20 @@ const Chat = ({ currentChannel }) => {
   console.log("La estructura de los mensajes: ", messagesState);
   console.log("La estructura del allProfiles: ", allProfiles);
 
-  const messageFormater = (allProfiles) => {
-    allProfiles.results.map((user) => user.user__id === 214);
-    console.log(
-      "El filtrado: ",
-      allProfiles.results.map((user) => user.user__id === 214)
-    );
-  };
+  // const messageFormater = (allProfiles) => {
+  //   allProfiles.results.map((user) => user.user__id === 214);
+  //   console.log(
+  //     "El filtrado: ",
+  //     allProfiles.results.map((user) => user.user__id === 214)
+  //   );
+  // };
 
   useEffect(() => {
     if (currentChannel) {
       dispatch(getMessages(currentChannel));
-      if (allProfiles) {
-        messageFormater(allProfiles);
-      }
+      // if (allProfiles) {
+      //   messageFormater(allProfiles);
+      // }
     }
   }, [currentChannel, dispatch]);
 

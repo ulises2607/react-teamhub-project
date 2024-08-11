@@ -14,7 +14,7 @@ const Profile = () => {
   useEffect(() => {
     if (token) {
       dispatch(fetchProfile(token));
-      dispatch(fetchAllProfiles(token));
+      console.log("El token en servercomp: ", token);
     }
   }, [dispatch, token]);
 
@@ -24,7 +24,7 @@ const Profile = () => {
 
   const handleLogout = () => {
     console.log("Cerrando sesión");
-    // dispatch(logout);
+    dispatch(logout);
 
     navigate("/login");
   };
