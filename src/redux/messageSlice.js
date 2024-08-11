@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const base_url = import.meta.env.VITE_API_URL;
-const authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
+let authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
 
 const initialState = {
   messages: [],
@@ -83,6 +83,8 @@ export const getMessages = createAsyncThunk(
 export const sendMessage = createAsyncThunk(
   "messages/sendMessage",
   async (messageData, { rejectWithValue }) => {
+    console.log("El token que se envia alc rear mensaje: ", authorization);
+
     try {
       // Enviar el nuevo mensaje
       const response = await axios.post(
@@ -151,7 +153,14 @@ export const deleteMessage = createAsyncThunk(
 const messageSlice = createSlice({
   name: "messages",
   initialState,
-  reducers: {},
+  reducers: {
+    clearMessages: (state) => {
+      state.messages = [];
+      state.isLoading = false;
+      state.errors = null;
+      authorization = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getMessages.pending, (state) => {
@@ -192,4 +201,5 @@ const messageSlice = createSlice({
   },
 });
 
+export const { clearMessages } = messageSlice.actions;
 export default messageSlice.reducer;
