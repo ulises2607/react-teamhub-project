@@ -33,7 +33,7 @@
 
 # 📖 Project Description <a name="project-description"></a>
 
-**TeamHub** es una aplicación web que emula las funcionalidades básicas de Discord. Permite la gestión de servidores, canales y mensajes, así como el inicio de sesión de usuarios y la edición de perfiles.
+**TeamHub** is a web application that emulates the basic functionalities of Discord. It allows the management of servers, channels, and messages, as well as user login and profile editing.
 
 ## 🛠 Built With <a name="built-with"></a>
 
@@ -58,12 +58,12 @@
 
 ### Key Features <a name="key-features"></a>
 
-- **Iniciar sesión y autenticar usuarios.**
-- **CRUD de servidores: crear, leer, actualizar y eliminar servidores.**
-- **CRUD de canales: gestionar canales dentro de cada servidor.**
-- **CRUD de mensajes: enviar, editar y eliminar mensajes en los canales.**
-- **Buscar servidores y unirse a ellos.**
-- **Editar el perfil de usuario.**
+- **User login and authentication.**
+- **Server CRUD: create, read, update, and delete servers.**
+- **Channel CRUD: manage channels within each server.**
+- **Message CRUD: send, edit, and delete messages in channels.**
+- **Search and join servers.**
+- **Edit user profiles.**
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -114,16 +114,16 @@ Install this project with:
 
 <!-- AUTHORS -->
 
-## 👥 Author <a name="authors"></a>
+## 👥 Authors <a name="authors"></a>
 
 👤 **Cesar Ulises Cappa**
 
 - GitHub: [@ulises2607](https://github.com/ulises2607)
 - LinkedIn: [Cesar Ulises Cappa Subelza](https://www.linkedin.com/in/cesar-ulises-cappa-subelza/)
 
-  **Rodrigo Eduardo Gonza**
+👤 **Rodrigo Eduardo Gonza**
 
-- GitHub: [@rodrigo](https://github.com/ulises2607)
+- GitHub: [@rodrigonza92](https://github.com/rodrigonza92)
 - LinkedIn: [Rodrigo Gonza](http://www.linkedin.com/in/rodrigo-gonza)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -132,9 +132,9 @@ Install this project with:
 
 ## 🔭 Future Features <a name="future-features"></a>
 
-- [ ] **Añadir soporte para videollamadas y llamadas de voz.**
-- [ ] **Implementar un sistema de notificaciones en tiempo real**
-- [ ] **Optimizar la experiencia de usuario con más funcionalidades personalizadas.**
+- [ ] **Add support for video and voice calls.**
+- [ ] **Implement a real-time notification system.**
+- [ ] **Optimize the user experience with more personalized features.**
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -152,7 +152,7 @@ Feel free to check the [issues page](../../issues/).
 
 ## ⭐️ Show your support <a name="support"></a>
 
-If you like this project consider adding a ⭐️
+If you like this project, consider giving it a ⭐️
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -160,7 +160,7 @@ If you like this project consider adding a ⭐️
 
 ## 🙏 Acknowledgments <a name="acknowledgements"></a>
 
-- Agradecimientos a UPATECO por brindarnos esta experiencia.
+- Special thanks to UPATECO for providing us with this experience.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
