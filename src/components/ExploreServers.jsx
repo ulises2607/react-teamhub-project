@@ -56,7 +56,7 @@ const ExploreServers = () => {
         />
       </div>
       {isLoading && <p className="text-center text-gray-600">Loading...</p>}
-      {errors && <p className="text-center text-red-500">{errors}</p>}
+      {errors?.detail && <p className="text-center text-red-500">{errors.detail}</p>}
       <ul className="space-y-4">
         {servers.length > 0 ? (
           servers.map((server) => (

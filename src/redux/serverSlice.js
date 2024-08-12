@@ -100,27 +100,35 @@ export const exploreServers = createAsyncThunk(
 
 // Unirse a un servidor
 export const joinServer = createAsyncThunk(
-  "servers/joinServer",
-  async (serverId, { rejectWithValue }) => {
-    try {
-      const authorization = localStorage
-        .getItem("tokennn")
-        ?.replace(/(^"|"$)/g, "");
-      const response = await axios.post(
-        `${base_url}/teamhub/members/${serverId}/`,
-        {},
-        {
-          headers: {
-            Authorization: `Token ${authorization}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+    "servers/joinServer",
+    async (serverId, { rejectWithValue }) => {
+      try {
+        const authorization = localStorage
+          .getItem("tokennn")
+          ?.replace(/(^"|"$)/g, "");
+          
+        const requestBody = {
+          "server": serverId
+        };
+  
+        const response = await axios.post(
+          `${base_url}/teamhub/members/`,
+          requestBody,
+          {
+            headers: {
+              Authorization: `Token ${authorization}`,
+              "Content-Type": "application/json"
+            },
+          }
+        );
+  
+        return response.data;
+      } catch (error) {
+        return rejectWithValue(error.response?.data || error.message);
+      }
     }
-  }
-);
+  );
+  
 
 const serversSlice = createSlice({
   name: "servers",
@@ -177,7 +185,7 @@ const serversSlice = createSlice({
       })
       .addCase(exploreServers.rejected, (state, action) => {
         state.isLoading = false;
-        state.errors = action.payload;
+        state.errors = action.payload.detail || "Error al explorar servidores";
       });
   },
 });
