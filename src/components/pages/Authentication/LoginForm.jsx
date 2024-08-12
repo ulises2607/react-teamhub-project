@@ -24,35 +24,38 @@ const LoginForm = () => {
 
   return (
     <div className="w-full h-screen">
-      <div className="h-full flex ">
-        <div className="hidden lg:flex w-full lg:w-1/2 justify-around items-center login_img_section">
-          <div className="bg-black opacity-20 inset-0 z-0"></div>
-          <div className="w-full mx-auto px-20 flex-col items-center space-y-6">
+      <div className="h-full flex">
+        <div className="hidden lg:flex w-full lg:w-1/2 relative overflow-hidden">
+          <video
+            autoPlay
+            loop
+            muted
+            className="absolute inset-0 w-full h-full object-cover"
+          >
+            <source
+              src="https://cdn.pixabay.com/video/2018/03/04/14696-258543627_large.mp4"
+              type="video/mp4"
+            />
+          </video>
+          <div className="absolute inset-0 bg-black opacity-40"></div>
+          <div className="relative z-10 flex flex-col justify-center items-center h-full text-center text-white p-10">
             <h1 className="text-white font-bold text-4xl font-sans">
-              Simple App
+              Bienvenido!
             </h1>
-            <p className="text-white mt-1">The simplest app to use</p>
-            <div className="flex justify-center lg:justify-start mt-6">
-              <a
-                href="#"
-                className="hover:bg-indigo-700 hover:text-white hover:-translate-y-1 transition-all duration-500 bg-white text-indigo-800 mt-4 px-4 py-2 rounded-2xl font-bold mb-2"
-              >
-                Get Started
-              </a>
-            </div>
+            <p className="text-white mt-1">Powered by React-Error-Lab</p>
           </div>
         </div>
-        <div className="flex w-full lg:w-1/2 justify-center items-center bg-white space-y-8">
+        <div className="flex w-full lg:w-1/2 justify-center items-center bg-black space-y-8">
           <div className="w-full px-8 md:px-32 lg:px-24">
             <form
               onSubmit={handleSubmit}
               className="bg-white rounded-md shadow-2xl p-5"
             >
               <h1 className="text-gray-800 font-bold text-2xl mb-1">
-                Hello Again!
+                Hola Amigo!
               </h1>
               <p className="text-sm font-normal text-gray-600 mb-8">
-                Welcome Back
+                Comencemos...
               </p>
               <div className="flex items-center border-2 mb-8 py-2 px-3 rounded-2xl">
                 <svg
@@ -74,7 +77,7 @@ const LoginForm = () => {
                   className="pl-2 w-full outline-none border-none"
                   type="text"
                   name="username"
-                  placeholder="Username (Document ID)"
+                  placeholder="Introduce tu usuario..."
                 />
               </div>
               <div className="flex items-center border-2 mb-12 py-2 px-3 rounded-2xl">
@@ -95,37 +98,19 @@ const LoginForm = () => {
                   type="password"
                   name="password"
                   id="password"
-                  placeholder="Password"
+                  placeholder="Introduce tu contraseña..."
                 />
               </div>
               <button
                 type="submit"
                 className="block w-full bg-indigo-600 mt-5 py-2 rounded-2xl hover:bg-indigo-700 hover:-translate-y-1 transition-all duration-500 text-white font-semibold mb-2"
               >
-                Login
+                Iniciar
               </button>
-              <div className="flex justify-between mt-4">
-                <span className="text-sm ml-2 hover:text-blue-500 cursor-pointer hover:-translate-y-1 duration-500 transition-all">
-                  Forgot Password?
-                </span>
-                <a
-                  href="#"
-                  className="text-sm ml-2 hover:text-blue-500 cursor-pointer hover:-translate-y-1 duration-500 transition-all"
-                >
-                  Don't have an account yet?
-                </a>
-              </div>
             </form>
           </div>
         </div>
       </div>
-      <style jsx>{`
-        .login_img_section {
-          background: linear-gradient(rgba(2, 2, 2, 0.7), rgba(0, 0, 0, 0.7)),
-            url(https://i.pinimg.com/564x/68/b5/7d/68b57de7f066e628c7f2578e0fab97c3.jpg)
-              center center;
-        }
-      `}</style>
     </div>
   );
 };
