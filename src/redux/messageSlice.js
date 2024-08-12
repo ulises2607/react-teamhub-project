@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const base_url = import.meta.env.VITE_API_URL;
-let authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
+let authorization = "";
 
 const initialState = {
   messages: [],
@@ -39,6 +39,7 @@ export const getMessages = createAsyncThunk(
   "messages/getMessages",
   async (channelId, { rejectWithValue }) => {
     try {
+      authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
       // Obtener los mensajes del canal
       const response = await axios.get(`${base_url}/teamhub/messages/`, {
         headers: {
@@ -86,7 +87,7 @@ export const sendMessage = createAsyncThunk(
     console.log("El token que se envia alc rear mensaje: ", authorization);
 
     try {
-      // Enviar el nuevo mensaje
+      authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
       const response = await axios.post(
         `${base_url}/teamhub/messages/`,
         messageData,
@@ -131,7 +132,7 @@ export const deleteMessage = createAsyncThunk(
   "messages/deleteMessage",
   async (messageId, { rejectWithValue }) => {
     try {
-      // Realizar la solicitud DELETE para eliminar el mensaje
+      authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
       await axios.delete(`${base_url}/teamhub/messages/${messageId}/`, {
         headers: {
           Authorization: `Token ${authorization}`,

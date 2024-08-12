@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../redux/auth/authSlice";
+import { clearServers } from "../redux/serverSlice";
+import { clearMessages } from "../redux/messageSlice";
+import { clearChannels } from "../redux/channelSlice";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -19,6 +22,9 @@ const Profile = () => {
 
   const handleLogout = () => {
     dispatch(logout());
+    dispatch(clearMessages());
+    dispatch(clearChannels());
+    dispatch(clearServers());
     navigate("/login");
   };
 

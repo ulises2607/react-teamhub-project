@@ -1,0 +1,55 @@
+.bg-discord-dark {
+  background-color: #36393f;
+}
+
+.bg-discord-light {
+  background-color: #2f3136;
+}
+
+.bg-discord-blue {
+  background-color: #5865f2;
+}
+
+.bg-discord-blue-dark {
+  background-color: #4752c4;
+}
+
+.border-discord-input {
+  border-color: #202225;
+}
+
+input::placeholder {
+  color: #a0a0a0;
+}
+
+input:focus {
+  background-color: transparent;
+}
+
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #2f3136 inset;
+  box-shadow: 0 0 0 1000px #2f3136 inset;
+}
+
+.login_img_section {
+  position: relative;
+  background: url("/login-image.jpg") center center/cover no-repeat;
+  filter: blur(4px);
+}
+
+.form-container {
+  position: relative;
+  z-index: 1;
+  background: rgba(47, 49, 54, 0.8);
+}
+
+.form-container {
+  position: relative;
+  z-index: 1;
+  background: rgba(47, 49, 54, 0.8);
+  transition: box-shadow 1s;
+}
+
+.form-container:hover {
+  box-shadow: 0 0 20px #10193a;
+}

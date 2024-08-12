@@ -34,13 +34,13 @@ export const createChannel = createAsyncThunk(
       const response = await axios.post(
         `${base_url}/teamhub/channels/`,
         {
-          name: name, // Aquí enviamos el nombre como string
-          server: server, // Aquí enviamos el ID del servidor como entero
+          name: name,
+          server: server,
         },
         {
           headers: {
             Authorization: `Token ${authorization}`,
-            "Content-Type": "application/json", // Cambiamos el tipo de contenido a JSON
+            "Content-Type": "application/json",
           },
         }
       );

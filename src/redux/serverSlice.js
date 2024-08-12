@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const base_url = import.meta.env.VITE_API_URL;
-const authorization = "";
+let authorization = "";
 
 // Estado inicial de los servers
 const initialState = {
@@ -16,7 +16,9 @@ export const createServer = createAsyncThunk(
   "server/createServer",
   async (serverData, { rejectWithValue }) => {
     try {
-      const authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
+      const authorization = localStorage
+        .getItem("tokennn")
+        ?.replace(/(^"|"$)/g, "");
       const formData = new FormData();
       formData.append("name", serverData.name);
       formData.append("description", serverData.description);
@@ -50,11 +52,12 @@ export const getServers = createAsyncThunk(
   "server/getServers",
   async (_, { rejectWithValue }) => {
     try {
+      const authorization = localStorage
+        .getItem("tokennn")
+        ?.replace(/(^"|"$)/g, "");
       const response = await axios.get(`${base_url}/teamhub/servers/`, {
         headers: {
-          Authorization: `Token ${localStorage
-            .getItem("tokennn")
-            ?.replace(/(^"|"$)/g, "")}`,
+          Authorization: `Token ${authorization}`,
         },
       });
       console.log(response.data.results);
@@ -72,49 +75,53 @@ export const getServers = createAsyncThunk(
 
 // Explorar servidores
 export const exploreServers = createAsyncThunk(
-    "server/exploreServers",
-    async (queryParams, { rejectWithValue }) => {
-      try {
-        const authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
-        const response = await axios.get(`${base_url}/teamhub/servers/`, {
+  "server/exploreServers",
+  async (queryParams, { rejectWithValue }) => {
+    try {
+      const authorization = localStorage
+        .getItem("tokennn")
+        ?.replace(/(^"|"$)/g, "");
+      const response = await axios.get(`${base_url}/teamhub/servers/`, {
+        headers: {
+          Authorization: `Token ${authorization}`,
+        },
+        params: queryParams,
+      });
+      return response.data.results;
+    } catch (error) {
+      if (error.response && error.response.data) {
+        return rejectWithValue(
+          error.response.data.message || "Error al explorar servidores"
+        );
+      }
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Unirse a un servidor
+export const joinServer = createAsyncThunk(
+  "servers/joinServer",
+  async (serverId, { rejectWithValue }) => {
+    try {
+      const authorization = localStorage
+        .getItem("tokennn")
+        ?.replace(/(^"|"$)/g, "");
+      const response = await axios.post(
+        `${base_url}/teamhub/members/${serverId}/`,
+        {},
+        {
           headers: {
             Authorization: `Token ${authorization}`,
           },
-          params: queryParams,
-        });
-        return response.data.results;
-      } catch (error) {
-        if (error.response && error.response.data) {
-          return rejectWithValue(
-            error.response.data.message || "Error al explorar servidores"
-          );
         }
-        return rejectWithValue(error.message);
-      }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
     }
-  );
-  
-  // Unirse a un servidor
-  export const joinServer = createAsyncThunk(
-    "servers/joinServer",
-    async (serverId, { rejectWithValue }) => {
-      try {
-        const authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
-        const response = await axios.post(
-          `${base_url}/teamhub/members/${serverId}/`,
-          {},
-          {
-            headers: {
-              Authorization: `Token ${authorization}`,
-            },
-          }
-        );
-        return response.data;
-      } catch (error) {
-        return rejectWithValue(error.response?.data || error.message);
-      }
-    }
-  );
+  }
+);
 
 const serversSlice = createSlice({
   name: "servers",
