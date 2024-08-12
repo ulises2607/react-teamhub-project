@@ -60,7 +60,6 @@ export const getServers = createAsyncThunk(
           Authorization: `Token ${authorization}`,
         },
       });
-      console.log(response.data.results);
       return response.data.results;
     } catch (error) {
       if (error.response && error.response.data) {
