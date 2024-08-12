@@ -24,22 +24,39 @@ const LoginForm = () => {
   }
 
   return (
-    <div className="w-full h-screen bg-discord-dark">
+    <div className="w-full h-screen">
       <div className="h-full flex">
-        <div className="hidden lg:flex w-full lg:w-1/2 justify-around items-center login_img_section">
-          <div className="bg-black opacity-20 inset-0 z-0"></div>
+        <div className="hidden lg:flex w-full lg:w-1/2 relative overflow-hidden">
+          <video
+            autoPlay
+            loop
+            muted
+            className="absolute inset-0 w-full h-full object-cover"
+          >
+            <source
+              src="https://cdn.pixabay.com/video/2018/03/04/14696-258543627_large.mp4"
+              type="video/mp4"
+            />
+          </video>
+          <div className="absolute inset-0 bg-black opacity-40"></div>
+          <div className="relative z-10 flex flex-col justify-center items-center h-full text-center text-white p-10">
+            <h1 className="text-white font-bold text-4xl font-sans">
+              Bienvenido!
+            </h1>
+            <p className="text-white mt-1">Powered by React-Error-Lab</p>
+          </div>
         </div>
-        <div className="flex w-full lg:w-1/2 justify-center items-center bg-discord-light space-y-8">
+        <div className="flex w-full lg:w-1/2 justify-center items-center bg-black space-y-8">
           <div className="w-full px-8 md:px-32 lg:px-24">
             <form
               onSubmit={handleSubmit}
-              className="bg-discord-light rounded-lg shadow-2xl form-container p-5"
+              className="bg-white rounded-lg shadow-2xl form-container p-5"
             >
-              <h1 className="text-gray-100 font-bold text-2xl mb-1">
-                Hello Again!
+              <h1 className="text-gray-800 font-bold text-2xl mb-1">
+                Hola Amigo!
               </h1>
-              <p className="text-sm font-normal text-gray-300 mb-8">
-                Welcome Back
+              <p className="text-sm font-normal text-gray-600 mb-8">
+                Comencemos...
               </p>
               <div className="flex items-center border-2 mb-8 py-2 px-3 rounded-2xl border-discord-input">
                 <svg
@@ -58,10 +75,10 @@ const LoginForm = () => {
                 </svg>
                 <input
                   id="username"
-                  className="pl-2 w-full outline-none border-none bg-transparent text-white"
+                  className="pl-2 w-full outline-none border-none bg-transparent "
                   type="text"
                   name="username"
-                  placeholder="Username (Document ID)"
+                  placeholder="Introduce tu usuario..."
                 />
               </div>
               <div className="flex items-center border-2 mb-12 py-2 px-3 rounded-2xl border-discord-input">
@@ -78,30 +95,19 @@ const LoginForm = () => {
                   />
                 </svg>
                 <input
-                  className="pl-2 w-full outline-none border-none bg-transparent text-white"
+                  className="pl-2 w-full outline-none border-none bg-transparent"
                   type="password"
                   name="password"
                   id="password"
-                  placeholder="Password"
+                  placeholder="Introduce tu contraseña..."
                 />
               </div>
               <button
                 type="submit"
                 className="block w-full bg-discord-blue mt-5 py-2 rounded-2xl hover:bg-discord-blue-dark hover:-translate-y-1 transition-all duration-500 text-white font-semibold mb-2"
               >
-                Login
+                Iniciar
               </button>
-              <div className="flex justify-between mt-4">
-                <span className="text-sm ml-2 text-gray-300 hover:text-blue-500 cursor-pointer hover:-translate-y-1 duration-500 transition-all">
-                  Forgot Password?
-                </span>
-                <a
-                  href="#"
-                  className="text-sm ml-2 text-gray-300 hover:text-blue-500 cursor-pointer hover:-translate-y-1 duration-500 transition-all"
-                >
-                  Don't have an account yet?
-                </a>
-              </div>
             </form>
           </div>
         </div>

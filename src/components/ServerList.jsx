@@ -34,8 +34,13 @@ const ServerList = ({ onSelectServer }) => {
   };
 
   return (
-    <div className="p-4 bg-gray-900 h-full relative">
-      <h2 className="text-white text-sm mb-4">My Servers</h2>
+    <div className="p-4 w-full bg-gray-900 h-full relative">
+      <img
+        src="./logo.jpeg"
+        alt=""
+        className="w-14 h-14 rounded-full flex justify-center items-center mb-4 ml-2 border-b-white"
+      />
+      <div className="border-[1px] mb-5"></div>
       <ul>
         {filteredServers && filteredServers.length > 0 ? (
           filteredServers.map((server) => (
