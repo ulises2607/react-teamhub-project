@@ -28,7 +28,14 @@ const ExploreServers = () => {
   };
 
   const handleJoinServer = (serverId) => {
-    dispatch(joinServer(serverId));
+    dispatch(joinServer(serverId)).then((action) => {
+      if (action.meta.requestStatus === "fulfilled") {
+        navigate("/main"); // Redirigir a la MainPage
+      } else {
+        // Aquí podrías manejar el error si la unión al servidor falla
+        console.error("Error al unirse al servidor:", action.payload);
+      }
+    });
   };
 
   const handleBackToMain = () => {
