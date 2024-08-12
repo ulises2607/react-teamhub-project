@@ -39,7 +39,7 @@ const Profile = () => {
       <button onClick={toggleMenu} className="flex items-center">
         <img
           className="w-10 h-10 rounded-full"
-          src={profile.profile_image || "/user.png"}
+          src={profile.profile_image || "https://cdn.discordapp.com/embed/avatars/1.png"}
           alt="User"
         />
         <span className="ml-2 text-white">
