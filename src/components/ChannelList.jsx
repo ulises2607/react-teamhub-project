@@ -43,7 +43,7 @@ const ChannelList = ({ currentServer, onSelectChannel, serverName }) => {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full z-0">
       <div className="flex items-center justify-between p-4 bg-gray-800 text-white">
         <h2 className="text-xl font-bold">{serverName}</h2>
         <button

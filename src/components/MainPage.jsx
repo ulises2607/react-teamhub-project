@@ -9,6 +9,8 @@ import { createServer, getServers } from "../redux/serverSlice";
 import ServerForm from "./ui/ServerForm";
 import { fetchProfile } from "../redux/profileSlice";
 import { useNavigate } from "react-router-dom";
+import { MdOutlineExplore } from "react-icons/md";
+import { FaPlus } from "react-icons/fa";
 
 const MainPage = () => {
   const [currentServer, setCurrentServer] = useState(null);
@@ -53,7 +55,7 @@ const MainPage = () => {
   };
 
   const handleExploreServers = () => {
-    navigate('/explore-servers');
+    navigate("/explore-servers");
   };
 
   return (
@@ -63,24 +65,18 @@ const MainPage = () => {
           <div className="flex-grow overflow-y-auto">
             <ServerList onSelectServer={handleSelectServer} />
           </div>
-          <div className="p-2">
+          <div className="p-2 flex flex-col items-center">
             <button
               onClick={handleCreateServer}
-              className="bg-white opacity-25 h-12 w-12 flex items-center justify-center text-black text-2xl font-semibold rounded-3xl mb-1 overflow-hidden"
+              className="bg-gray-700 h-10 w-10 flex items-center justify-center rounded-3xl mb-1 overflow-hidden transition-all duration-1000 hover:bg-green-700 hover:rounded-xl"
             >
-              <svg
-                className="fill-current h-10 w-10 block"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-              >
-                <path d="M16 10c0 .553-.048 1-.601 1H11v4.399c0 .552-.447.601-1 .601-.553 0-1-.049-1-.601V11H4.601C4.049 11 4 10.553 4 10c0-.553.049-1 .601-1H9V4.601C9 4.048 9.447 4 10 4c.553 0 1 .048 1 .601V9h4.399c.553 0 .601.447.601 1z" />
-              </svg>
+              <FaPlus className="text-green-700 bg-transparent-700 rounded-full w-6 h-6 hover:text-white transition-all duration-1000" />
             </button>
             <button
               onClick={handleExploreServers}
-              className="mt-4 p-2 bg-green-500 rounded text-white mx-4"
+              className="h-10 w-10 mt-4 p-1 bg-gray-700 text-white mx-4 rounded-3xl flex items-center justify-center transition-all duration-1000 hover:bg-green-700 hover:rounded-xl"
             >
-              Explorar Servidores
+              <MdOutlineExplore className="text-green-700 bg-transparent w-6 h-6 transition-all duration-1000  hover:text-white" />
             </button>
           </div>
         </div>
