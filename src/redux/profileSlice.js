@@ -5,12 +5,12 @@ const base_url = import.meta.env.VITE_API_URL;
 let authorization = "";
 
 const initialState = {
-  data: null,
+  data: null, // Datos del perfil del usuario
   isLoading: false,
   error: null,
 };
 
-// Thunk para obtener los datos del perfil
+//  Realiza una solicitud para obtener los datos del perfil del usuario autenticado.
 export const fetchProfile = createAsyncThunk(
   "profile/fetchProfile",
   async (_, { rejectWithValue }) => {
@@ -33,7 +33,7 @@ export const fetchProfile = createAsyncThunk(
   }
 );
 
-// Thunk para actualizar el perfil
+// Actualiza los datos del perfil del usuario en el servidor.
 export const updateProfile = createAsyncThunk(
   "profile/updateProfile",
   async ({ profileData }, { rejectWithValue }) => {
@@ -60,6 +60,7 @@ const profileSlice = createSlice({
   name: "profile",
   initialState,
   reducers: {
+    // Limpia los datos del perfil en el estado, borra el token de localStorage y reinicia las variables relacionadas con la autenticación.
     clearProfile: (state) => {
       state.data = null;
       state.isLoading = false;

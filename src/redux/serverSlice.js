@@ -6,12 +6,12 @@ let authorization = "";
 
 // Estado inicial de los servers
 const initialState = {
-  servers: [],
+  servers: [], // Lista de servidores
   isLoading: false,
   errors: null,
 };
 
-// Post Server
+// Envía una solicitud para crear un nuevo servidor.
 export const createServer = createAsyncThunk(
   "server/createServer",
   async (serverData, { rejectWithValue }) => {
@@ -23,7 +23,7 @@ export const createServer = createAsyncThunk(
       formData.append("name", serverData.name);
       formData.append("description", serverData.description);
       formData.append("icon", serverData.icon);
-
+        //Envía los datos del servidor como un FormData incluyendo nombre, descripción e ícono.
       const response = await axios.post(
         `${base_url}/teamhub/servers/`,
         formData,
@@ -47,7 +47,7 @@ export const createServer = createAsyncThunk(
   }
 );
 
-// Obtención de servidores
+// Obtiene la lista de servidores del usuario autenticado.
 export const getServers = createAsyncThunk(
   "server/getServers",
   async (_, { rejectWithValue }) => {
@@ -72,7 +72,7 @@ export const getServers = createAsyncThunk(
   }
 );
 
-// Explorar servidores
+// Explora servidores en la plataforma basándose en parámetros de consulta.
 export const exploreServers = createAsyncThunk(
   "server/exploreServers",
   async (queryParams, { rejectWithValue }) => {
@@ -98,7 +98,7 @@ export const exploreServers = createAsyncThunk(
   }
 );
 
-// Unirse a un servidor
+// Permite unirse a un servidor enviando una solicitud con el ID del servidor.
 export const joinServer = createAsyncThunk(
     "servers/joinServer",
     async (serverId, { rejectWithValue }) => {
@@ -134,6 +134,7 @@ const serversSlice = createSlice({
   name: "servers",
   initialState,
   reducers: {
+    // Limpia la lista de servidores y resetea el estado relacionado con errores y la autenticación.
     clearServers: (state) => {
       localStorage.removeItem("tokennn");
       state.servers = [];
