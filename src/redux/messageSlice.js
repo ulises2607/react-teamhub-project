@@ -1,17 +1,21 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+// Se define la URL base para las peticiones a la API usando variables de entorno.
 const base_url = import.meta.env.VITE_API_URL;
-let authorization = "";
+let authorization = ""; // Variable para almacenar el token de autorización.
 
+// Estado inicial del slice de mensajes.
 const initialState = {
-  messages: [],
-  isLoading: false,
-  errors: null,
+  messages: [], // Array para almacenar los mensajes.
+  isLoading: false, // Indicador de si se está cargando la información.
+  errors: null, // Almacena errores en caso de que ocurran.
 };
 
+// Función auxiliar que obtiene los perfiles de los autores a partir de sus IDs.
 const fetchAuthorProfiles = async (authorIds, authorization) => {
   try {
+    // Creamos un array de promesas para obtener los perfiles de cada autor.
     const authorPromises = authorIds.map((id) =>
       axios.get(`${base_url}/users/profiles/${id}/`, {
         headers: {
@@ -39,8 +43,10 @@ export const getMessages = createAsyncThunk(
   "messages/getMessages",
   async (channelId, { rejectWithValue }) => {
     try {
+      // Obtenemos el token de autorización desde el almacenamiento local.
       authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
-      // Obtener los mensajes del canal
+      
+      // Hacemos una solicitud GET para obtener los mensajes de un canal específico.
       const response = await axios.get(`${base_url}/teamhub/messages/`, {
         headers: {
           Authorization: `Token ${authorization}`,
@@ -84,10 +90,11 @@ export const getMessages = createAsyncThunk(
 export const sendMessage = createAsyncThunk(
   "messages/sendMessage",
   async (messageData, { rejectWithValue }) => {
-    console.log("El token que se envia alc rear mensaje: ", authorization);
-
+    // Obtener el token de autorización desde el almacenamiento local.
     try {
       authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
+      
+      // Hacemos una solicitud POST para enviar un nuevo mensaje.
       const response = await axios.post(
         `${base_url}/teamhub/messages/`,
         messageData,
@@ -132,7 +139,10 @@ export const deleteMessage = createAsyncThunk(
   "messages/deleteMessage",
   async (messageId, { rejectWithValue }) => {
     try {
+      // Obtenemos el token de autorización desde el almacenamiento local.
       authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
+      
+      // Hacemos una solicitud DELETE para eliminar un mensaje por su ID.
       await axios.delete(`${base_url}/teamhub/messages/${messageId}/`, {
         headers: {
           Authorization: `Token ${authorization}`,
@@ -151,10 +161,12 @@ export const deleteMessage = createAsyncThunk(
   }
 );
 
+// Definimos el slice de mensajes con sus reducers y casos extra.
 const messageSlice = createSlice({
   name: "messages",
   initialState,
   reducers: {
+    // Reducer para limpiar los mensajes y resetear el estado.
     clearMessages: (state) => {
       state.messages = [];
       state.isLoading = false;
@@ -169,7 +181,7 @@ const messageSlice = createSlice({
       })
       .addCase(getMessages.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.messages = action.payload;
+        state.messages = action.payload; // Guardamos los mensajes obtenidos.
       })
       .addCase(getMessages.rejected, (state, action) => {
         state.isLoading = false;
@@ -180,7 +192,7 @@ const messageSlice = createSlice({
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.messages.push(action.payload);
+        state.messages.push(action.payload); // Añadimos el nuevo mensaje.
       })
       .addCase(sendMessage.rejected, (state, action) => {
         state.isLoading = false;
@@ -191,6 +203,7 @@ const messageSlice = createSlice({
       })
       .addCase(deleteMessage.fulfilled, (state, action) => {
         state.isLoading = false;
+        // Filtramos los mensajes para eliminar el mensaje por su ID.
         state.messages = state.messages.filter(
           (message) => message.id !== action.payload
         );
@@ -202,5 +215,6 @@ const messageSlice = createSlice({
   },
 });
 
+// Exportamos las acciones y el reducer del slice.
 export const { clearMessages } = messageSlice.actions;
 export default messageSlice.reducer;

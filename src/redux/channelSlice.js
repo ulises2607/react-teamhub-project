@@ -3,15 +3,16 @@ import axios from "axios";
 
 const base_url = import.meta.env.VITE_API_URL;
 let authorization = "";
-
+// Estado inicial
 const initialState = {
-  channels: [],
-  isLoading: false,
-  errors: null,
+  channels: [], // Lista de canales obtenidos de la API que se inicia vacía
+  isLoading: false, // Indicador de si una operacion de gestion de canales está en curso
+  errors: null, // Indicador de mensaje de error en caso de fallos en las operaciones con canales
 };
 
 // Obtención de canales
 export const getChannels = createAsyncThunk("channel/getChannels", async () => {
+    //Esta funcion asincrona obtiene una lista de canales de la API utilizando un token de autenticacion almacenado en localStorage
   try {
     authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
     const response = await axios.get(`${base_url}/teamhub/channels`, {
@@ -30,6 +31,7 @@ export const getChannels = createAsyncThunk("channel/getChannels", async () => {
 export const createChannel = createAsyncThunk(
   "channels/createChannel",
   async ({ server, name }, { rejectWithValue }) => {
+    // Esta funcion crea un nuevo canal en el servidor. En caso de exito, devuelve los datos del canal recien creado. En caso de error, devuelve un mensaje de error
     try {
       const response = await axios.post(
         `${base_url}/teamhub/channels/`,
@@ -61,6 +63,7 @@ export const createChannel = createAsyncThunk(
 export const updateChannel = createAsyncThunk(
   "channels/updateChannel",
   async ({ id, name }, { rejectWithValue }) => {
+    // Esta funcion actualiza el nombre de un canal en el servidor. Recibe el ID y el nuevo nombre del canal. En caso de exito, devuelve los datos del canal actualizados. En caso de error, devuelve un mensaje de error
     try {
       const response = await axios.put(
         `${base_url}/teamhub/channels/${id}`,
@@ -88,6 +91,7 @@ export const updateChannel = createAsyncThunk(
 export const deleteChannel = createAsyncThunk(
   "channels/deleteChannel",
   async (id, { rejectWithValue }) => {
+    // Esta funcion elimina un canal en el servidor. Recibe el ID del canal. En caso de exito, devuelve el ID del canal eliminado. En caso de error, devuelve un mensaje de error
     try {
       await axios.delete(`${base_url}/teamhub/channels/${id}`, {
         headers: {
@@ -114,7 +118,7 @@ const channelsSlice = createSlice({
       state.data = null;
       state.isLoading = false;
       state.errors = null;
-      authorization = null;
+      authorization = null; // Limpia el token de autorizacion al limpiar los canales.
     },
   },
   extraReducers: (builder) => {
@@ -124,7 +128,7 @@ const channelsSlice = createSlice({
       })
       .addCase(getChannels.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.channels = action.payload;
+        state.channels = action.payload; // Almacena la lista de canales obtenidos
       })
       .addCase(getChannels.rejected, (state, action) => {
         state.isLoading = false;
@@ -135,7 +139,7 @@ const channelsSlice = createSlice({
       })
       .addCase(createChannel.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.channels.push(action.payload);
+        state.channels.push(action.payload); // Añade el nuevo canal a la lista
       })
       .addCase(createChannel.rejected, (state, action) => {
         state.isLoading = false;
@@ -150,7 +154,7 @@ const channelsSlice = createSlice({
           (channel) => channel.id === action.payload.id
         );
         if (index !== -1) {
-          state.channels[index] = action.payload;
+          state.channels[index] = action.payload; // Actualiza el canal en la lista
         }
       })
       .addCase(updateChannel.rejected, (state, action) => {
@@ -163,7 +167,7 @@ const channelsSlice = createSlice({
       .addCase(deleteChannel.fulfilled, (state, action) => {
         state.isLoading = false;
         state.channels = state.channels.filter(
-          (channel) => channel.id !== action.payload
+          (channel) => channel.id !== action.payload // Elimina el canal de la lista
         );
       })
       .addCase(deleteChannel.rejected, (state, action) => {
