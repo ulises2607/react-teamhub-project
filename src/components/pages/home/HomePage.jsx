@@ -11,6 +11,9 @@ const HomePage = () => {
     { name: "React Router", icon: "reactrouter.svg" },
     { name: "Redux", icon: "redux.svg" },
     { name: "Tailwind", icon: "tailwindcss.svg" },
+    { name: "Vercel", icon: "vercel.svg" },
+    { name: "Git", icon: "git.svg" },
+    { name: "Github", icon: "github.svg" },
   ];
 
   const teamMembers = [
@@ -44,6 +47,8 @@ const HomePage = () => {
 
       {/* Contenido */}
       <div className="relative z-10 flex flex-col items-center">
+        <h2 className="mb-6 text-4xl font-bold tracking-tight text-white sm:text-6xl">Aplicación de Mensajería</h2>
+        
         {/* Logo */}
         <div className="flex items-center justify-center mb-8">
             <img
@@ -52,6 +57,14 @@ const HomePage = () => {
                 className="w-40 h-40 rounded-full shadow-lg"
             />
         </div>
+
+        {/* Botón de Login */}
+        <button
+          onClick={() => navigate("/login")}
+          className="bg-indigo-500 text-white px-6 py-2 rounded-lg hover:bg-indigo-600 transition-colors duration-300 mb-4"
+        >
+          Iniciar Sesión
+        </button>
 
         {/* Título de Tecnologías */}
         <h2 className="text-3xl font-semibold text-white mb-4 text-center">
@@ -100,14 +113,6 @@ const HomePage = () => {
             ))}
           </ul>
         </div>
-
-        {/* Botón de Login */}
-        <button
-          onClick={() => navigate("/login")}
-          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-300"
-        >
-          Iniciar Sesión
-        </button>
       </div>
     </div>
   );
