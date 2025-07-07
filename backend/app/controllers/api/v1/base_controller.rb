@@ -1,6 +1,5 @@
 class Api::V1::BaseController < ApplicationController
-  protect_from_forgery with: :null_session
-  before_action :authenticate_user!, except: [:index]
+  # No aplicamos authenticate_user! por defecto, cada controlador decidirá
   
   respond_to :json
   

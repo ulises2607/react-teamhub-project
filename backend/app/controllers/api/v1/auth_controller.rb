@@ -1,7 +1,7 @@
 class Api::V1::AuthController < Api::V1::BaseController
-  skip_before_action :authenticate_user!, only: [:login, :register]
+  before_action :authenticate_user!, except: [:login, :register]
   
-  # POST /api/v1/auth/register
+  # POST /api/v1/register
   def register
     user = User.new(user_params)
     
