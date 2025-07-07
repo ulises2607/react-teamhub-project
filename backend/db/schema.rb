@@ -10,9 +10,48 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_07_221326) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_07_231002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "channels", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "channel_type", default: "TEXT", null: false
+    t.integer "position", default: 0
+    t.bigint "server_id", null: false
+    t.bigint "profile_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["profile_id"], name: "index_channels_on_profile_id"
+    t.index ["server_id", "name"], name: "index_channels_on_server_id_and_name", unique: true
+    t.index ["server_id", "position"], name: "index_channels_on_server_id_and_position"
+    t.index ["server_id"], name: "index_channels_on_server_id"
+  end
+
+  create_table "members", force: :cascade do |t|
+    t.bigint "profile_id", null: false
+    t.bigint "server_id", null: false
+    t.string "role", default: "GUEST", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["profile_id", "server_id"], name: "index_members_on_profile_id_and_server_id", unique: true
+    t.index ["profile_id"], name: "index_members_on_profile_id"
+    t.index ["server_id"], name: "index_members_on_server_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.text "content"
+    t.string "file_url"
+    t.bigint "member_id", null: false
+    t.bigint "channel_id", null: false
+    t.boolean "deleted", default: false, null: false
+    t.datetime "edited_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["channel_id", "created_at"], name: "index_messages_on_channel_id_and_created_at"
+    t.index ["channel_id"], name: "index_messages_on_channel_id"
+    t.index ["member_id"], name: "index_messages_on_member_id"
+  end
 
   create_table "profiles", force: :cascade do |t|
     t.bigint "user_id", null: false
@@ -21,6 +60,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_07_221326) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_profiles_on_user_id"
+  end
+
+  create_table "servers", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.string "image_url"
+    t.string "invite_code", null: false
+    t.bigint "profile_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invite_code"], name: "index_servers_on_invite_code", unique: true
+    t.index ["profile_id"], name: "index_servers_on_profile_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -37,5 +88,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_07_221326) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  add_foreign_key "channels", "profiles"
+  add_foreign_key "channels", "servers"
+  add_foreign_key "members", "profiles"
+  add_foreign_key "members", "servers"
+  add_foreign_key "messages", "channels"
+  add_foreign_key "messages", "members"
   add_foreign_key "profiles", "users"
+  add_foreign_key "servers", "profiles"
 end

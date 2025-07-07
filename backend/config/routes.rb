@@ -11,9 +11,15 @@ Rails.application.routes.draw do
       delete '/logout', to: 'auth#logout'
       get '/me', to: 'auth#me'
       
+      # Servers routes
+      resources :servers, except: [:new, :edit] do
+        collection do
+          post :join
+        end
+      end
+      
       # Future routes for other resources
       # resources :profiles, only: [:show, :update]
-      # resources :servers
       # resources :channels
       # resources :messages
     end
