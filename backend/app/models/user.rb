@@ -1,29 +1,29 @@
 class User < ApplicationRecord
-  include Devise::JWT::RevocationStrategies::JTIMatcher
-
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
-         :trackable, :jwt_authenticatable,
-        jwt_revocation_strategy: self
-
+         :jwt_authenticatable, jwt_revocation_strategy: Devise::JWT::RevocationStrategies::Null
+  
   # Validations
-  validates :username, presence: true, uniqueness: {case_sensitive: false}
-  validates :username, length: { minimum: 3, maximum: 20 }
-  validates :username, format: { with: /\A[a-zA-Z0-9_]+\z/, message: "only allows letters, numbers, and underscores" }
-
-  # Enums
-  enum :status, { online: 0, away: 1, busy: 2, invisible: 3 }
-
+  validates :username, presence: true, uniqueness: true, length: { minimum: 3, maximum: 20 }
+  validates :email, presence: true, uniqueness: true
+  
+  # Associations
+  has_one :profile, dependent: :destroy
+  has_many :members, through: :profile
+  has_many :servers, through: :members
+  
   # Callbacks
-
-  before_create :set_default_display_name
-
+  after_create :create_profile
+  
   private
-
-  def set_default_display_name
-    self.display_name = username if display_name.blank?
+  
+  def create_profile
+    Profile.create!(
+      user: self,
+      name: self.username,
+      image_url: nil
+    )
   end
-
 end

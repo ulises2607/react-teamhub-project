@@ -1,26 +1,33 @@
 class ApplicationController < ActionController::API
-  respond_to :json
-
+  before_action :authenticate_user!
+  before_action :configure_permitted_parameters, if: :devise_controller?
+  
   protected
-
+  
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:username])
+    devise_parameter_sanitizer.permit(:account_update, keys: [:username])
+  end
+  
+  private
+  
   def authenticate_user!
-    # Obtener header Authorization
-    header = request.headers['Authorization']
-    # Extraer solo el token (sin "Bearer ")
-    header = header.split(' ').last if header
-
+    token = request.headers['Authorization']&.split(' ')&.last
+    return render json: { error: 'Token missing' }, status: :unauthorized unless token
+    
     begin
-      # Decodificar el token JWT
-      @decoded = JsonWebToken.decode(header)
-      # Buscar el usuario por el ID del token
-      @current_user = User.find(@decoded[:user_id])
-    rescue ActiveRecord::RecordNotFound => e
-      render json: {errors: e.message }, status: :unauthorized
-    rescue JWT::DecodeError => e
-      render json: {errors: e.message }, status: :unauthorized
+      decoded_token = JWT.decode(
+        token, 
+        Rails.application.credentials.jwt_secret_key || 'your-secret-key-here'
+      )
+      
+      user_id = decoded_token[0]['user_id']
+      @current_user = User.find(user_id)
+    rescue JWT::DecodeError, JWT::ExpiredSignature, ActiveRecord::RecordNotFound
+      render json: { error: 'Invalid or expired token' }, status: :unauthorized
     end
   end
-
+  
   def current_user
     @current_user
   end
