@@ -1,4 +1,4 @@
-class Api::V1::Auth::RegistrationsController < ApplicationController
+class Api::V1::Auth::RegistrationsController < Devise::RegistrationsController
   respond_to :json
   def create
     build_resource(sign_up_params)
@@ -15,4 +15,11 @@ class Api::V1::Auth::RegistrationsController < ApplicationController
       }, status: :unprocessable_entity
     end
   end
+
+  private
+  def sign_up_params
+    params.require(:user).permit(:email, :password, :password_confirmation, :username, :display_name, :avatar_url, :bio, :status)
+  end
+
+
 end
