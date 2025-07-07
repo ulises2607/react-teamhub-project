@@ -16,12 +16,20 @@ Rails.application.routes.draw do
         collection do
           post :join
         end
+        
+        # Nested routes for channels within servers
+        resources :channels, except: [:new, :edit] do
+          # Nested routes for messages within channels
+          resources :messages, except: [:new, :edit, :show]
+        end
       end
+      
+      # Direct access to channels and messages (for cases where we might need them)
+      resources :channels, only: [:show, :update, :destroy]
+      resources :messages, only: [:show, :update, :destroy]
       
       # Future routes for other resources
       # resources :profiles, only: [:show, :update]
-      # resources :channels
-      # resources :messages
     end
   end
   
