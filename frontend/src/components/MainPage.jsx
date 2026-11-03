@@ -49,10 +49,7 @@ const MainPage = () => {
     setShowServerForm(true);
   };
 
-  const handleServerFormSubmit = (serverData) => {
-    dispatch(createServer(serverData));
-    setShowServerForm(false);
-  };
+  const handleServerFormSubmit = (serverData) => dispatch(createServer(serverData)).unwrap();
 
   const handleExploreServers = () => {
     navigate("/explore-servers");

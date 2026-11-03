@@ -1,20 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-
-const baseUrl = import.meta.env.VITE_API_URL;
-const headers = () => ({
-  Authorization: `Token ${localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "") || ""}`,
-});
-const errorMessage = (error, fallback) => error.response?.data?.detail || error.response?.data?.message || fallback;
+import { api, errorText, getAll } from "../lib/api";
 
 // A profile is optional: its failure must never hide or duplicate a saved message.
 const withAuthors = async (messages, requestHeaders) => {
   const ids = [...new Set(messages.map((message) => message.author))];
   const profiles = await Promise.all(ids.map(async (id) => {
     try {
-      const response = await axios.get(`${baseUrl}/users/profiles/${id}/`, { headers: requestHeaders });
+      const response = await api.get(`/users/profiles/${id}/`, { headers: requestHeaders });
       return [id, response.data];
-    } catch {
+      } catch {
       return [id, null];
     }
   }));
@@ -24,32 +18,30 @@ const withAuthors = async (messages, requestHeaders) => {
 
 export const getMessages = createAsyncThunk("messages/getMessages", async (channelId, { rejectWithValue, signal }) => {
   try {
-    const requestHeaders = headers();
-    const response = await axios.get(`${baseUrl}/teamhub/messages/`, {
-      headers: requestHeaders, signal, params: { channel: channelId, ordering: "created_at" },
-    });
-    return await withAuthors(response.data.results ?? response.data, requestHeaders);
+    const requestHeaders = {};
+    const messages = await getAll("/teamhub/messages/", { signal, params: { channel: channelId, ordering: "created_at" } });
+    return await withAuthors(messages, requestHeaders);
   } catch (error) {
-    return rejectWithValue(errorMessage(error, "No se pudieron cargar los mensajes."));
+    return rejectWithValue(errorText(error, "No se pudieron cargar los mensajes."));
   }
 });
 
 export const sendMessage = createAsyncThunk("messages/sendMessage", async (messageData, { rejectWithValue }) => {
   try {
-    const requestHeaders = headers();
-    const response = await axios.post(`${baseUrl}/teamhub/messages/`, messageData, { headers: requestHeaders });
+    const requestHeaders = {};
+    const response = await api.post(`/teamhub/messages/`, messageData, { headers: requestHeaders });
     return (await withAuthors([response.data], requestHeaders))[0];
   } catch (error) {
-    return rejectWithValue(errorMessage(error, "No se pudo enviar el mensaje. Intenta nuevamente."));
+    return rejectWithValue(errorText(error, "No se pudo enviar el mensaje. Intenta nuevamente."));
   }
 });
 
 export const deleteMessage = createAsyncThunk("messages/deleteMessage", async (id, { rejectWithValue }) => {
   try {
-    await axios.delete(`${baseUrl}/teamhub/messages/${id}/`, { headers: headers() });
+    await api.delete(`/teamhub/messages/${id}/`, { headers: {} });
     return id;
   } catch (error) {
-    return rejectWithValue(errorMessage(error, "No se pudo eliminar el mensaje."));
+    return rejectWithValue(errorText(error, "No se pudo eliminar el mensaje."));
   }
 });
 
