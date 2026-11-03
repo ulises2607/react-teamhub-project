@@ -1,55 +1,37 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-// Estado inicial
-const initialState = {
-  token: JSON.parse(localStorage.getItem("tokennn")) || null, // Token de autenticacion almacenado en el LocalStorage o null si no existe
-  isLoading: false, // Indicador de si una operacion de autenticacion está en curso
-  error: null, // Mensaje de error en caso de fallo en la autenticacion setteado como null al inicio
-  message: null, // Mensaje informativo opcional setteado como null al inicio
-};
+import { api, readToken, errorText } from "../../lib/api";
 
-export const login = createAsyncThunk(
-  "auth/login",
-  async (credentials, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api-auth/`,
-        credentials
-      );
-      const token = response.data.token;
-      localStorage.setItem("tokennn", JSON.stringify(token)); // Guarda el token generado en localStorage
-
-      return token;
-    } catch (error) {
-      console.error("Error durante el login:", error);
-      return rejectWithValue(error.response?.data || error.message); //Se rechaza la accion con un mensaje de error
-    }
+const initialState = { token: readToken(), isLoading: false, error: null, requestId: null };
+export const login = createAsyncThunk("auth/login", async (credentials, { rejectWithValue }) => {
+  try {
+    const response = await api.post("/api-auth/", credentials);
+    if (!response.data.token) throw new Error("Missing token");
+    return response.data.token;
+  } catch (error) {
+    return rejectWithValue(errorText(error, "No se pudo iniciar sesión. Revisa tu usuario y contraseña."));
   }
-);
-
-const auhtSlice = createSlice({
-  name: "auth",
-  initialState,
+}, { condition: (_, { getState }) => !getState().auth.isLoading });
+const authSlice = createSlice({
+  name: "auth", initialState,
   reducers: {
     logout: (state) => {
-      localStorage.removeItem("tokennn"); // Elimina el token del localStorage al cerrar sesion.
-      state.token = null;
-      state.isLoading = false;
-      state.error = null;
+      localStorage.removeItem("tokennn");
+      Object.assign(state, { token: null, isLoading: false, error: null, requestId: null });
     },
   },
-  extraReducers: (builder) => {
-    builder
-      .addCase(login.pending, (state) => {
-        state.isLoading = true; // Activa el indicador de carga cuando se inicia el login
-      })
-      .addCase(login.fulfilled, (state, action) => {
-        state.isLoading = false; // Desactiva el indicador de carga cuando el login es exitoso
-        state.token = action.payload; // Almacena el token recibido en el estado
-      });
-  },
+  extraReducers: (builder) => builder
+    .addCase(login.pending, (state, action) => {
+      state.isLoading = true; state.error = null; state.requestId = action.meta.requestId;
+    })
+    .addCase(login.fulfilled, (state, action) => {
+      if (state.requestId !== action.meta.requestId) return;
+      localStorage.setItem("tokennn", JSON.stringify(action.payload));
+      state.isLoading = false; state.token = action.payload;
+    })
+    .addCase(login.rejected, (state, action) => {
+      if (state.requestId !== action.meta.requestId) return;
+      state.isLoading = false; state.error = action.payload || "No se pudo iniciar sesión.";
+    }),
 });
-
-export const { logout } = auhtSlice.actions;
-
-export default auhtSlice.reducer;
+export const { logout } = authSlice.actions;
+export default authSlice.reducer;

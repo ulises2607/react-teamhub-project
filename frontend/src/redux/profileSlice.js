@@ -1,102 +1,56 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { api, errorText } from "../lib/api";
 
-const base_url = import.meta.env.VITE_API_URL;
-let authorization = "";
-
-const initialState = {
-  data: null, // Datos del perfil del usuario
-  isLoading: false,
-  error: null,
-};
-
-//  Realiza una solicitud para obtener los datos del perfil del usuario autenticado.
-export const fetchProfile = createAsyncThunk(
-  "profile/fetchProfile",
-  async (_, { rejectWithValue }) => {
-    try {
-      authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
-      const response = await axios.get(
-        `${base_url}/users/profiles/profile_data/`,
-        {
-          headers: {
-            Authorization: `Token ${authorization}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(
-        error.response.data || "Error fetching profile data"
-      );
-    }
+export const fetchProfile = createAsyncThunk("profile/fetchProfile", async (_, { rejectWithValue, signal }) => {
+  try {
+    signal.throwIfAborted();
+    return (await api.get("/users/profiles/profile_data/", { signal })).data;
+  } catch (error) {
+    return rejectWithValue(errorText(error));
   }
-);
-
-// Actualiza los datos del perfil del usuario en el servidor.
-export const updateProfile = createAsyncThunk(
-  "profile/updateProfile",
-  async ({ profileData }, { rejectWithValue }) => {
-    try {
-      const authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
-      const response = await axios.put(
-        `${base_url}/users/profiles/profile_data/`,
-        profileData,
-        {
-          headers: {
-            Authorization: `Token ${authorization}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data || "Failed to update profile");
-    }
+});
+export const updateProfile = createAsyncThunk("profile/updateProfile", async ({ profileData }, { rejectWithValue, signal }) => {
+  try {
+    signal.throwIfAborted();
+    return (await api.patch("/users/profiles/profile_data/", profileData)).data;
+  } catch (error) {
+    return rejectWithValue(errorText(error));
   }
-);
-
-const profileSlice = createSlice({
-  name: "profile",
-  initialState,
-  reducers: {
-    // Limpia los datos del perfil en el estado, borra el token de localStorage y reinicia las variables relacionadas con la autenticación.
-    clearProfile: (state) => {
-      state.data = null;
-      state.isLoading = false;
-      state.error = null;
-      authorization = null;
-      localStorage.removeItem("tokennn");
-    },
-  },
+});
+const initialState = { data: null, isLoading: false, error: null, requestIds: {} };
+const slice = createSlice({
+  name: "profile", initialState,
+  reducers: { clearProfile: () => ({ ...initialState }) },
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchProfile.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(fetchProfile.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.data = action.payload;
-      })
-      .addCase(fetchProfile.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      })
-      .addCase(updateProfile.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(updateProfile.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.data = action.payload;
-      })
-      .addCase(updateProfile.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      });
+    builder.addCase(fetchProfile.pending, (state, action) => {
+      state.requestIds.fetchProfile = action.meta.requestId;
+      state.isLoading = true; state.error = null;
+    }).addCase(fetchProfile.fulfilled, (state, action) => {
+      if (state.requestIds.fetchProfile !== action.meta.requestId) return;
+      delete state.requestIds.fetchProfile;
+      state.isLoading = Object.keys(state.requestIds).length > 0;
+      state.data = action.payload;
+    }).addCase(fetchProfile.rejected, (state, action) => {
+      if (state.requestIds.fetchProfile !== action.meta.requestId) return;
+      delete state.requestIds.fetchProfile;
+      state.isLoading = Object.keys(state.requestIds).length > 0;
+      if (!action.meta.aborted) state.error = action.payload || "No se pudo completar la operación.";
+    });
+    builder.addCase(updateProfile.pending, (state, action) => {
+      state.requestIds.updateProfile = action.meta.requestId;
+      state.isLoading = true; state.error = null;
+    }).addCase(updateProfile.fulfilled, (state, action) => {
+      if (state.requestIds.updateProfile !== action.meta.requestId) return;
+      delete state.requestIds.updateProfile;
+      state.isLoading = Object.keys(state.requestIds).length > 0;
+      state.data = action.payload;
+    }).addCase(updateProfile.rejected, (state, action) => {
+      if (state.requestIds.updateProfile !== action.meta.requestId) return;
+      delete state.requestIds.updateProfile;
+      state.isLoading = Object.keys(state.requestIds).length > 0;
+      if (!action.meta.aborted) state.error = action.payload || "No se pudo completar la operación.";
+    });
   },
 });
-
-export const { clearProfile } = profileSlice.actions;
-export default profileSlice.reducer;
+export const { clearProfile } = slice.actions;
+export default slice.reducer;

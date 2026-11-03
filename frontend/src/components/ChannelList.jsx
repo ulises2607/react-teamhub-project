@@ -1,124 +1,45 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getChannels,
-  createChannel,
-  updateChannel,
-  deleteChannel,
-} from "../redux/channelSlice";
-import Profile from "./Profile";
-import { IoMdAdd } from "react-icons/io";
-
-const ChannelList = ({ currentServer, onSelectChannel, serverName }) => {
+import PropTypes from "prop-types";
+import { getChannels, createChannel, updateChannel, deleteChannel } from "../redux/channelSlice";
+export default function ChannelList({ currentServer, currentChannel, onSelectChannel, onDeleteChannel, serverName }) {
   const dispatch = useDispatch();
-  const channelsState = useSelector((state) => state.channels);
-  const [visibleMenuId, setVisibleMenuId] = useState(null);
-
-  useEffect(() => {
-    if (currentServer) {
-      dispatch(getChannels(currentServer));
-    }
-  }, [dispatch, currentServer]);
-
-  const filteredChannels = channelsState.channels.filter(
-    (channel) => channel.server === currentServer
-  );
-
-  const handleCreateChannel = () => {
-    const channelName = prompt("Introduce el nombre del nuevo canal:");
-    if (channelName) {
-      dispatch(createChannel({ server: currentServer, name: channelName }));
-    }
+  const { channels, isLoading, errors } = useSelector((state) => state.channels);
+  const profile = useSelector((state) => state.profile.data);
+  const server = useSelector((state) => state.servers.servers.find((item) => item.id === currentServer));
+  const canManage = server?.owner === profile?.user__id;
+  const [editing, setEditing] = useState(null);
+  const [name, setName] = useState("");
+  const [menu, setMenu] = useState(null);
+  const [formError, setFormError] = useState(null);
+  useEffect(() => { const request = dispatch(getChannels(currentServer)); return () => request.abort(); }, [dispatch, currentServer]);
+  const openForm = (channel) => { setEditing(channel || { id: null }); setName(channel?.name || ""); setFormError(null); setMenu(null); };
+  const submit = async (event) => {
+    event.preventDefault();
+    if (!name.trim() || isLoading) return;
+    const action = editing.id ? updateChannel({ id: editing.id, name: name.trim() }) : createChannel({ server: currentServer, name: name.trim() });
+    const result = await dispatch(action);
+    if (result.meta.requestStatus === "fulfilled") setEditing(null);
+    else setFormError(result.payload || "No se pudo guardar el canal.");
   };
-
-  const handleUpdateChannel = (id) => {
-    const newName = prompt("Introduce el nuevo nombre del canal:");
-    if (newName) {
-      dispatch(updateChannel({ id, name: newName }));
-    }
+  const remove = async (channel) => {
+    if (!window.confirm(`¿Eliminar el canal #${channel.name}?`)) return;
+    const result = await dispatch(deleteChannel(channel.id));
+    if (deleteChannel.fulfilled.match(result)) onDeleteChannel(channel.id);
+    setMenu(null);
   };
-
-  const toggleMenu = (id) => {
-    setVisibleMenuId(visibleMenuId === id ? null : id);
-  };
-
-  return (
-    <div className="flex flex-col h-full z-0">
-      <div className="flex items-center justify-between p-4 bg-gray-800 text-white">
-        <h2 className="text-xl font-bold">{serverName}</h2>
-        <button
-          onClick={handleCreateChannel}
-          className="bg-transparent  text-white hover:text-green-700 font-bold py-1 px-3 rounded"
-        >
-          <IoMdAdd />
-        </button>
-      </div>
-
-      <div className="flex-1 overflow-y-auto bg-gray-800">
-        {channelsState.isLoading && (
-          <p className="text-white p-4">Cargando...</p>
-        )}
-        {channelsState.errors && (
-          <p className="text-red-500 p-4">{channelsState.errors}</p>
-        )}
-        {filteredChannels.length > 0 ? (
-          <ul className="list-none p-4">
-            {filteredChannels.map((channel) => (
-              <li
-                key={channel.id}
-                className="flex items-center justify-between mb-2 bg-tr rounded"
-              >
-                <button
-                  onClick={() => onSelectChannel(channel.id, channel.name)}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:text-white"
-                >
-                  #{channel.name}
-                </button>
-                <div className="relative">
-                  <button
-                    onClick={() => toggleMenu(channel.id)}
-                    className="px-2 text-gray-400  hover:text-green-700 focus:outline-none"
-                  >
-                    •••
-                  </button>
-                  {visibleMenuId === channel.id && (
-                    <ul className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg">
-                      <li>
-                        <button
-                          onClick={() => handleUpdateChannel(channel.id)}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
-                        >
-                          Modificar nombre
-                        </button>
-                      </li>
-                      <li>
-                        <button
-                          onClick={() => dispatch(deleteChannel(channel.id))}
-                          className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-200"
-                        >
-                          Eliminar
-                        </button>
-                      </li>
-                    </ul>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="flex items-center justify-center h-full p-4">
-            <span className="text-white">
-              No hay canales disponibles. Crea uno!
-            </span>
-          </div>
-        )}
-      </div>
-
-      <div className="px-6 py-3 max-h-[75px] bg-gray-800 border-t border-gray-600 flex items-center">
-        <Profile />
-      </div>
-    </div>
-  );
+  const filtered = channels.filter((channel) => String(channel.server) === String(currentServer));
+  return <div className="channel-list"><div className="sidebar-title"><span className="eyebrow">ESPACIO DE TRABAJO</span><h2>{serverName}</h2></div>
+    <div className="channel-heading"><span>CANALES DE TEXTO</span>{canManage && <button onClick={() => openForm(null)} aria-label="Crear canal" title="Crear canal">+</button>}</div>
+    {editing && <form className="channel-form" onSubmit={submit}><label htmlFor="channel-name">{editing.id ? "Renombrar canal" : "Nuevo canal"}</label><input id="channel-name" value={name} onChange={(event) => setName(event.target.value)} required maxLength={100} autoFocus disabled={isLoading} /><div className="form-actions"><button type="button" onClick={() => setEditing(null)} disabled={isLoading}>Cancelar</button><button disabled={isLoading || !name.trim()}>{isLoading ? "Guardando…" : "Guardar"}</button></div>{formError && <p role="alert" className="form-error">{formError}</p>}</form>}
+    {isLoading && <p className="sidebar-status" role="status">Cargando canales…</p>}
+    {errors && !editing && <div className="sidebar-status" role="alert"><p>{errors}</p><button onClick={() => dispatch(getChannels(currentServer))}>Reintentar</button></div>}
+    <ul>{filtered.map((channel) => <li key={channel.id} className={currentChannel === channel.id ? "active" : ""}><button className="channel-select" aria-current={currentChannel === channel.id ? "page" : undefined} onClick={() => onSelectChannel(channel.id, channel.name)}><span aria-hidden="true">#</span><span>{channel.name}</span></button>{canManage && <div className="channel-options"><button aria-label={`Opciones de ${channel.name}`} aria-expanded={menu === channel.id} onClick={() => setMenu(menu === channel.id ? null : channel.id)}>⋯</button>{menu === channel.id && <div className="channel-menu"><button onClick={() => openForm(channel)}>Renombrar</button><button disabled={isLoading} onClick={() => remove(channel)}>Eliminar canal</button></div>}</div>}</li>)}</ul>
+    {!isLoading && !errors && !filtered.length && <p className="sidebar-status">No hay canales todavía.{canManage && " Crea el primero para empezar."}</p>}
+  </div>;
+}
+ChannelList.propTypes = {
+  currentServer: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  currentChannel: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), serverName: PropTypes.string.isRequired,
+  onSelectChannel: PropTypes.func.isRequired, onDeleteChannel: PropTypes.func.isRequired,
 };
-
-export default ChannelList;

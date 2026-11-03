@@ -1,198 +1,101 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import { api, errorText, getAll } from "../lib/api";
 
-const base_url = import.meta.env.VITE_API_URL;
-let authorization = "";
-
-// Estado inicial de los servers
-const initialState = {
-  servers: [], // Lista de servidores
-  isLoading: false,
-  errors: null,
-};
-
-// Envía una solicitud para crear un nuevo servidor.
-export const createServer = createAsyncThunk(
-  "server/createServer",
-  async (serverData, { rejectWithValue }) => {
-    try {
-      const authorization = localStorage
-        .getItem("tokennn")
-        ?.replace(/(^"|"$)/g, "");
-      const formData = new FormData();
-      formData.append("name", serverData.name);
-      formData.append("description", serverData.description);
-      formData.append("icon", serverData.icon);
-        //Envía los datos del servidor como un FormData incluyendo nombre, descripción e ícono.
-      const response = await axios.post(
-        `${base_url}/teamhub/servers/`,
-        formData,
-        {
-          headers: {
-            Authorization: `Token ${authorization}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      return response.data;
-    } catch (error) {
-      if (error.response && error.response.data) {
-        return rejectWithValue(
-          error.response.data.message || "Error al crear servidor"
-        );
-      }
-      return rejectWithValue(error.message);
-    }
+export const getServers = createAsyncThunk("servers/getServers", async (_, { rejectWithValue, signal }) => {
+  try {
+    signal.throwIfAborted();
+    return await getAll("/teamhub/servers/", { signal });
+  } catch (error) {
+    return rejectWithValue(errorText(error));
   }
-);
-
-// Obtiene la lista de servidores del usuario autenticado.
-export const getServers = createAsyncThunk(
-  "server/getServers",
-  async (_, { rejectWithValue }) => {
-    try {
-      const authorization = localStorage
-        .getItem("tokennn")
-        ?.replace(/(^"|"$)/g, "");
-      const response = await axios.get(`${base_url}/teamhub/servers/`, {
-        headers: {
-          Authorization: `Token ${authorization}`,
-        },
-      });
-      return response.data.results;
-    } catch (error) {
-      if (error.response && error.response.data) {
-        return rejectWithValue(
-          error.response.data.message || "Error al obtener servidores"
-        );
-      }
-      return rejectWithValue(error.message);
-    }
+});
+export const exploreServers = createAsyncThunk("servers/exploreServers", async (params, { rejectWithValue, signal }) => {
+  try {
+    signal.throwIfAborted();
+    return await getAll("/teamhub/servers/", { signal, params });
+  } catch (error) {
+    return rejectWithValue(errorText(error));
   }
-);
-
-// Explora servidores en la plataforma basándose en parámetros de consulta.
-export const exploreServers = createAsyncThunk(
-  "server/exploreServers",
-  async (queryParams, { rejectWithValue }) => {
-    try {
-      const authorization = localStorage
-        .getItem("tokennn")
-        ?.replace(/(^"|"$)/g, "");
-      const response = await axios.get(`${base_url}/teamhub/servers/`, {
-        headers: {
-          Authorization: `Token ${authorization}`,
-        },
-        params: queryParams,
-      });
-      return response.data.results;
-    } catch (error) {
-      if (error.response && error.response.data) {
-        return rejectWithValue(
-          error.response.data.message || "Error al explorar servidores"
-        );
-      }
-      return rejectWithValue(error.message);
-    }
+});
+export const createServer = createAsyncThunk("servers/createServer", async (data, { rejectWithValue, signal }) => {
+  try {
+    signal.throwIfAborted();
+    const form = new FormData(); form.append("name", data.name); form.append("description", data.description); if (data.icon) form.append("icon", data.icon); return (await api.post("/teamhub/servers/", form)).data;
+  } catch (error) {
+    return rejectWithValue(errorText(error));
   }
-);
-
-// Permite unirse a un servidor enviando una solicitud con el ID del servidor.
-export const joinServer = createAsyncThunk(
-    "servers/joinServer",
-    async (serverId, { rejectWithValue }) => {
-      try {
-        const authorization = localStorage
-          .getItem("tokennn")
-          ?.replace(/(^"|"$)/g, "");
-          
-        const requestBody = {
-          "server": serverId
-        };
-  
-        const response = await axios.post(
-          `${base_url}/teamhub/members/`,
-          requestBody,
-          {
-            headers: {
-              Authorization: `Token ${authorization}`,
-              "Content-Type": "application/json"
-            },
-          }
-        );
-  
-        return response.data;
-      } catch (error) {
-        return rejectWithValue(error.response?.data || error.message);
-      }
-    }
-  );
-  
-
-const serversSlice = createSlice({
-  name: "servers",
-  initialState,
-  reducers: {
-    // Limpia la lista de servidores y resetea el estado relacionado con errores y la autenticación.
-    clearServers: (state) => {
-      localStorage.removeItem("tokennn");
-      state.servers = [];
-      state.isLoading = false;
-      state.errors = null;
-      authorization = null;
-    },
-  },
+});
+export const joinServer = createAsyncThunk("servers/joinServer", async (server, { rejectWithValue, signal }) => {
+  try {
+    signal.throwIfAborted();
+    return (await api.post("/teamhub/members/", { server })).data;
+  } catch (error) {
+    return rejectWithValue(errorText(error));
+  }
+});
+const initialState = { servers: [], isLoading: false, errors: null, requestIds: {} };
+const slice = createSlice({
+  name: "servers", initialState,
+  reducers: { clearServers: () => ({ ...initialState }) },
   extraReducers: (builder) => {
-    builder
-      .addCase(getServers.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getServers.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.servers = action.payload;
-      })
-      .addCase(getServers.rejected, (state, action) => {
-        state.isLoading = false;
-        state.errors = action.payload;
-      })
-      .addCase(createServer.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(createServer.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.servers.push(action.payload);
-      })
-      .addCase(createServer.rejected, (state, action) => {
-        state.isLoading = false;
-        state.errors = action.payload;
-      })
-      .addCase(joinServer.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(joinServer.fulfilled, (state) => {
-        state.isLoading = false;
-      })
-      .addCase(joinServer.rejected, (state, action) => {
-        state.isLoading = false;
-        state.errors = action.payload;
-      })
-      .addCase(exploreServers.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(exploreServers.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.servers = action.payload;
-      })
-      .addCase(exploreServers.rejected, (state, action) => {
-        state.isLoading = false;
-        state.errors = action.payload.detail || "Error al explorar servidores";
-      });
+    builder.addCase(getServers.pending, (state, action) => {
+      state.requestIds.list = action.meta.requestId;
+      state.isLoading = true; state.errors = null;
+    }).addCase(getServers.fulfilled, (state, action) => {
+      if (state.requestIds.list !== action.meta.requestId) return;
+      delete state.requestIds.list;
+      state.isLoading = Object.keys(state.requestIds).length > 0;
+      state.servers = action.payload;
+    }).addCase(getServers.rejected, (state, action) => {
+      if (state.requestIds.list !== action.meta.requestId) return;
+      delete state.requestIds.list;
+      state.isLoading = Object.keys(state.requestIds).length > 0;
+      if (!action.meta.aborted) state.errors = action.payload || "No se pudo completar la operación.";
+    });
+    builder.addCase(exploreServers.pending, (state, action) => {
+      state.requestIds.list = action.meta.requestId;
+      state.isLoading = true; state.errors = null;
+    }).addCase(exploreServers.fulfilled, (state, action) => {
+      if (state.requestIds.list !== action.meta.requestId) return;
+      delete state.requestIds.list;
+      state.isLoading = Object.keys(state.requestIds).length > 0;
+      state.servers = action.payload;
+    }).addCase(exploreServers.rejected, (state, action) => {
+      if (state.requestIds.list !== action.meta.requestId) return;
+      delete state.requestIds.list;
+      state.isLoading = Object.keys(state.requestIds).length > 0;
+      if (!action.meta.aborted) state.errors = action.payload || "No se pudo completar la operación.";
+    });
+    builder.addCase(createServer.pending, (state, action) => {
+      state.requestIds.createServer = action.meta.requestId;
+      state.isLoading = true; state.errors = null;
+    }).addCase(createServer.fulfilled, (state, action) => {
+      if (state.requestIds.createServer !== action.meta.requestId) return;
+      delete state.requestIds.createServer;
+      state.isLoading = Object.keys(state.requestIds).length > 0;
+      state.servers.push(action.payload);
+    }).addCase(createServer.rejected, (state, action) => {
+      if (state.requestIds.createServer !== action.meta.requestId) return;
+      delete state.requestIds.createServer;
+      state.isLoading = Object.keys(state.requestIds).length > 0;
+      if (!action.meta.aborted) state.errors = action.payload || "No se pudo completar la operación.";
+    });
+    builder.addCase(joinServer.pending, (state, action) => {
+      state.requestIds.joinServer = action.meta.requestId;
+      state.isLoading = true; state.errors = null;
+    }).addCase(joinServer.fulfilled, (state, action) => {
+      if (state.requestIds.joinServer !== action.meta.requestId) return;
+      delete state.requestIds.joinServer;
+      state.isLoading = Object.keys(state.requestIds).length > 0;
+      
+    }).addCase(joinServer.rejected, (state, action) => {
+      if (state.requestIds.joinServer !== action.meta.requestId) return;
+      delete state.requestIds.joinServer;
+      state.isLoading = Object.keys(state.requestIds).length > 0;
+      if (!action.meta.aborted) state.errors = action.payload || "No se pudo completar la operación.";
+    });
   },
 });
-
-export const { clearServers } = serversSlice.actions;
-
+export const { clearServers } = slice.actions;
 export const servers = (state) => state.servers;
-
-export default serversSlice.reducer;
+export default slice.reducer;
