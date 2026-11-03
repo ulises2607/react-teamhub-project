@@ -171,3 +171,14 @@ If you like this project, consider giving it a ⭐️
 This project is [MIT](./LICENSE) licensed.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Validar las mejoras del chat
+
+Desde `frontend`, instala las dependencias con `npm ci`. Configura `VITE_API_URL` en `.env.local` con la URL de una API compatible, sin barra final, y ejecuta `npm run dev`.
+
+- `npm run build`: compilación de producción.
+- `node --test src/redux/messageSlice.test.mjs`: pruebas de respuestas fuera de orden, envío entre canales y limpieza de sesión.
+
+El chat conserva el borrador si falla el envío y mantiene visible la conversación al enviar o eliminar mensajes. Si un perfil no carga, el mensaje sigue disponible. Las respuestas tardías de otros canales se descartan.
+
+Para comprobar el flujo completo hace falta una API disponible y una cuenta válida.

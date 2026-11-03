@@ -104,7 +104,7 @@ const MainPage = () => {
             />
           )}
           {currentChannel ? (
-            <Chat currentChannel={currentChannel} channelName={channelName} />
+            <Chat key={currentChannel} currentChannel={currentChannel} channelName={channelName} />
           ) : (
             <div className="flex items-center justify-center h-full">
               <span className="text-white">

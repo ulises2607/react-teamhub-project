@@ -1,220 +1,109 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// Se define la URL base para las peticiones a la API usando variables de entorno.
-const base_url = import.meta.env.VITE_API_URL;
-let authorization = ""; // Variable para almacenar el token de autorización.
+const baseUrl = import.meta.env.VITE_API_URL;
+const headers = () => ({
+  Authorization: `Token ${localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "") || ""}`,
+});
+const errorMessage = (error, fallback) => error.response?.data?.detail || error.response?.data?.message || fallback;
 
-// Estado inicial del slice de mensajes.
-const initialState = {
-  messages: [], // Array para almacenar los mensajes.
-  isLoading: false, // Indicador de si se está cargando la información.
-  errors: null, // Almacena errores en caso de que ocurran.
+// A profile is optional: its failure must never hide or duplicate a saved message.
+const withAuthors = async (messages, requestHeaders) => {
+  const ids = [...new Set(messages.map((message) => message.author))];
+  const profiles = await Promise.all(ids.map(async (id) => {
+    try {
+      const response = await axios.get(`${baseUrl}/users/profiles/${id}/`, { headers: requestHeaders });
+      return [id, response.data];
+    } catch {
+      return [id, null];
+    }
+  }));
+  const authors = Object.fromEntries(profiles);
+  return messages.map((message) => ({ ...message, authorProfile: authors[message.author] }));
 };
 
-// Función auxiliar que obtiene los perfiles de los autores a partir de sus IDs.
-const fetchAuthorProfiles = async (authorIds, authorization) => {
+export const getMessages = createAsyncThunk("messages/getMessages", async (channelId, { rejectWithValue, signal }) => {
   try {
-    // Creamos un array de promesas para obtener los perfiles de cada autor.
-    const authorPromises = authorIds.map((id) =>
-      axios.get(`${base_url}/users/profiles/${id}/`, {
-        headers: {
-          Authorization: `Token ${authorization}`,
-        },
-      })
-    );
-
-    // Espera a que todas las promesas se resuelvan
-    const authorProfiles = await Promise.all(authorPromises);
-
-    // Devuelve un mapa con los perfiles de los autores por su ID
-    return authorProfiles.reduce((acc, profile) => {
-      const userId = profile.data.user__id;
-      acc[userId] = profile.data;
-      return acc;
-    }, {});
+    const requestHeaders = headers();
+    const response = await axios.get(`${baseUrl}/teamhub/messages/`, {
+      headers: requestHeaders, signal, params: { channel: channelId, ordering: "created_at" },
+    });
+    return await withAuthors(response.data.results ?? response.data, requestHeaders);
   } catch (error) {
-    console.error("Error fetching author profiles:", error);
-    throw new Error("Failed to fetch author profiles");
+    return rejectWithValue(errorMessage(error, "No se pudieron cargar los mensajes."));
   }
+});
+
+export const sendMessage = createAsyncThunk("messages/sendMessage", async (messageData, { rejectWithValue }) => {
+  try {
+    const requestHeaders = headers();
+    const response = await axios.post(`${baseUrl}/teamhub/messages/`, messageData, { headers: requestHeaders });
+    return (await withAuthors([response.data], requestHeaders))[0];
+  } catch (error) {
+    return rejectWithValue(errorMessage(error, "No se pudo enviar el mensaje. Intenta nuevamente."));
+  }
+});
+
+export const deleteMessage = createAsyncThunk("messages/deleteMessage", async (id, { rejectWithValue }) => {
+  try {
+    await axios.delete(`${baseUrl}/teamhub/messages/${id}/`, { headers: headers() });
+    return id;
+  } catch (error) {
+    return rejectWithValue(errorMessage(error, "No se pudo eliminar el mensaje."));
+  }
+});
+
+const initialState = {
+  messages: [], isLoading: false, isSending: false, deletingIds: [], errors: null,
+  channelId: null, requestId: null,
 };
-
-export const getMessages = createAsyncThunk(
-  "messages/getMessages",
-  async (channelId, { rejectWithValue }) => {
-    try {
-      // Obtenemos el token de autorización desde el almacenamiento local.
-      authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
-      
-      // Hacemos una solicitud GET para obtener los mensajes de un canal específico.
-      const response = await axios.get(`${base_url}/teamhub/messages/`, {
-        headers: {
-          Authorization: `Token ${authorization}`,
-        },
-        params: {
-          channel: channelId,
-          ordering: "created_at",
-        },
-      });
-
-      const messages = response.data.results;
-
-      // Crear un array de IDs únicos de autores
-      const authorIds = [...new Set(messages.map((msg) => msg.author))];
-
-      // Obtener los perfiles de los autores
-      const authorProfilesMap = await fetchAuthorProfiles(
-        authorIds,
-        authorization
-      );
-
-      // Añadir los perfiles de los autores a los mensajes
-      const messagesWithAuthors = messages.map((msg) => ({
-        ...msg,
-        authorProfile: authorProfilesMap[msg.author] || null,
-      }));
-
-      return messagesWithAuthors;
-    } catch (error) {
-      if (error.response && error.response.data) {
-        return rejectWithValue(
-          error.response.data.message || "Failed to fetch messages"
-        );
-      }
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-// Enviar un nuevo mensaje
-export const sendMessage = createAsyncThunk(
-  "messages/sendMessage",
-  async (messageData, { rejectWithValue }) => {
-    // Obtener el token de autorización desde el almacenamiento local.
-    try {
-      authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
-      
-      // Hacemos una solicitud POST para enviar un nuevo mensaje.
-      const response = await axios.post(
-        `${base_url}/teamhub/messages/`,
-        messageData,
-        {
-          headers: {
-            Authorization: `Token ${authorization}`,
-          },
-        }
-      );
-
-      const newMessage = response.data;
-
-      // Obtener el perfil del autor del nuevo mensaje
-      const authorProfileResponse = await axios.get(
-        `${base_url}/users/profiles/${newMessage.author}/`,
-        {
-          headers: {
-            Authorization: `Token ${authorization}`,
-          },
-        }
-      );
-
-      // Agregar el perfil del autor al nuevo mensaje
-      const newMessageWithAuthorProfile = {
-        ...newMessage,
-        authorProfile: authorProfileResponse.data,
-      };
-
-      return newMessageWithAuthorProfile;
-    } catch (error) {
-      if (error.response && error.response.data) {
-        return rejectWithValue(
-          error.response.data.message || "Failed to send message"
-        );
-      }
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const deleteMessage = createAsyncThunk(
-  "messages/deleteMessage",
-  async (messageId, { rejectWithValue }) => {
-    try {
-      // Obtenemos el token de autorización desde el almacenamiento local.
-      authorization = localStorage.getItem("tokennn")?.replace(/(^"|"$)/g, "");
-      
-      // Hacemos una solicitud DELETE para eliminar un mensaje por su ID.
-      await axios.delete(`${base_url}/teamhub/messages/${messageId}/`, {
-        headers: {
-          Authorization: `Token ${authorization}`,
-        },
-      });
-
-      return messageId; // Retornamos el id del mensaje eliminado por si se usa despues
-    } catch (error) {
-      if (error.response && error.response.data) {
-        return rejectWithValue(
-          error.response.data.message || "Failed to delete message"
-        );
-      }
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-// Definimos el slice de mensajes con sus reducers y casos extra.
 const messageSlice = createSlice({
-  name: "messages",
-  initialState,
-  reducers: {
-    // Reducer para limpiar los mensajes y resetear el estado.
-    clearMessages: (state) => {
-      state.messages = [];
-      state.isLoading = false;
-      state.errors = null;
-      authorization = null;
-    },
-  },
+  name: "messages", initialState,
+  reducers: { clearMessages: () => ({ ...initialState }) },
   extraReducers: (builder) => {
     builder
-      .addCase(getMessages.pending, (state) => {
+      .addCase(getMessages.pending, (state, action) => {
+        if (state.channelId !== action.meta.arg) state.messages = [];
+        state.channelId = action.meta.arg;
+        state.requestId = action.meta.requestId;
         state.isLoading = true;
+        state.errors = null;
       })
       .addCase(getMessages.fulfilled, (state, action) => {
+        if (state.requestId !== action.meta.requestId) return;
         state.isLoading = false;
-        state.messages = action.payload; // Guardamos los mensajes obtenidos.
+        state.messages = action.payload;
       })
       .addCase(getMessages.rejected, (state, action) => {
+        if (state.requestId !== action.meta.requestId) return;
         state.isLoading = false;
-        state.errors = action.payload;
+        if (!action.meta.aborted) state.errors = action.payload;
       })
       .addCase(sendMessage.pending, (state) => {
-        state.isLoading = true;
+        state.isSending = true;
+        state.errors = null;
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.messages.push(action.payload); // Añadimos el nuevo mensaje.
+        state.isSending = false;
+        if (String(state.channelId) === String(action.meta.arg.channel)) state.messages.push(action.payload);
       })
       .addCase(sendMessage.rejected, (state, action) => {
-        state.isLoading = false;
-        state.errors = action.payload;
+        state.isSending = false;
+        if (String(state.channelId) === String(action.meta.arg.channel)) state.errors = action.payload;
       })
-      .addCase(deleteMessage.pending, (state) => {
-        state.isLoading = true;
+      .addCase(deleteMessage.pending, (state, action) => {
+        state.deletingIds.push(action.meta.arg);
+        state.errors = null;
       })
       .addCase(deleteMessage.fulfilled, (state, action) => {
-        state.isLoading = false;
-        // Filtramos los mensajes para eliminar el mensaje por su ID.
-        state.messages = state.messages.filter(
-          (message) => message.id !== action.payload
-        );
+        state.deletingIds = state.deletingIds.filter((id) => id !== action.meta.arg);
+        state.messages = state.messages.filter((message) => message.id !== action.payload);
       })
       .addCase(deleteMessage.rejected, (state, action) => {
-        state.isLoading = false;
+        state.deletingIds = state.deletingIds.filter((id) => id !== action.meta.arg);
         state.errors = action.payload;
       });
   },
 });
-
-// Exportamos las acciones y el reducer del slice.
 export const { clearMessages } = messageSlice.actions;
 export default messageSlice.reducer;
