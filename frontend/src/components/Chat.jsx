@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteMessage, getMessages, sendMessage } from "../redux/messageSlice";
 import MessageCard from "./ui/MessageCard";
@@ -6,6 +7,9 @@ import MessageCard from "./ui/MessageCard";
 const Chat = ({ currentChannel, channelName }) => {
   const dispatch = useDispatch();
   const { messages, isLoading, isSending, deletingIds, errors, channelId } = useSelector((state) => state.messages);
+  const end = useRef(null);
+  const stickToBottom = useRef(true);
+  useEffect(() => { if (stickToBottom.current) end.current?.scrollIntoView({ block: "end" }); }, [messages.length]);
   const [newMessage, setNewMessage] = useState("");
 
   useEffect(() => {
@@ -17,16 +21,16 @@ const Chat = ({ currentChannel, channelName }) => {
     event.preventDefault();
     if (!newMessage.trim() || isSending || isLoading) return;
     const result = await dispatch(sendMessage({ channel: currentChannel, content: newMessage.trim() }));
-    if (sendMessage.fulfilled.match(result)) setNewMessage("");
+    if (sendMessage.fulfilled.match(result)) { setNewMessage(""); stickToBottom.current = true; end.current?.scrollIntoView({ block: "end" }); }
   };
 
   return (
-    <section aria-label={`Chat de ${channelName}`} className="flex flex-col h-screen min-w-0 bg-gray-700 text-white">
+    <section aria-label={`Chat de ${channelName}`} className="flex flex-col h-full min-w-0 chat-surface text-white">
       <header className="border-b border-gray-600 px-6 py-4 shadow-sm">
         <h3 className="text-xl font-bold"><span className="text-gray-400">#</span> {channelName}</h3>
         <p className="text-sm text-gray-300 mt-1">Un espacio para compartir ideas con tu equipo.</p>
       </header>
-      <div className="flex-1 min-h-0 px-4 sm:px-6 py-4 overflow-y-auto" aria-busy={isLoading}>
+      <div className="flex-1 min-h-0 px-4 sm:px-6 py-4 overflow-y-auto" onScroll={(event) => { const box = event.currentTarget; stickToBottom.current = box.scrollHeight - box.scrollTop - box.clientHeight < 100; }} aria-busy={isLoading}>
         {isLoading ? <p role="status" className="text-gray-300">Cargando mensajes...</p> : (
           <div role="log" aria-label="Mensajes del canal" aria-live="polite">
             {channelId === currentChannel && messages.length > 0 ? messages.map((message) => (
@@ -36,6 +40,7 @@ const Chat = ({ currentChannel, channelName }) => {
             )) : <div className="py-16 text-center"><h4 className="text-xl font-semibold">Bienvenido a #{channelName}</h4><p className="mt-2 text-gray-300">La conversación empieza con vos. Envía el primer mensaje.</p></div>}
           </div>
         )}
+        <div ref={end} />
       </div>
       {errors && <div role="alert" className="mx-4 mb-3 p-3 rounded-lg bg-red-950 text-red-100"><p>{errors}</p><button type="button" onClick={() => dispatch(getMessages(currentChannel))} className="underline mt-2">Volver a cargar mensajes</button></div>}
       <form onSubmit={handleSendMessage} className="p-4 pt-0">
@@ -55,4 +60,5 @@ const Chat = ({ currentChannel, channelName }) => {
     </section>
   );
 };
+Chat.propTypes = { currentChannel: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired, channelName: PropTypes.string.isRequired };
 export default Chat;

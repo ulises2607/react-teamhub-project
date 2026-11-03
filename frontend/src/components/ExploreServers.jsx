@@ -1,98 +1,35 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { exploreServers, joinServer } from "../redux/serverSlice";
-import { useNavigate } from "react-router-dom";
-
-const ExploreServers = () => {
+import { Link, useNavigate } from "react-router-dom";
+import { fetchProfile } from "../redux/profileSlice";
+export default function ExploreServers() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { servers, isLoading, errors } = useSelector((state) => state.servers);
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchParams, setSearchParams] = useState({});
-
+  const profile = useSelector((state) => state.profile.data);
+  const [search, setSearch] = useState("");
+  const [joining, setJoining] = useState(null);
+  useEffect(() => { if (!profile) dispatch(fetchProfile()); }, [profile, dispatch]);
   useEffect(() => {
-    if (searchTerm) {
-      setSearchParams({ search: searchTerm });
-    } else {
-      setSearchParams({});
-    }
-  }, [searchTerm]);
-
-  useEffect(() => {
-    dispatch(exploreServers(searchParams));
-  }, [searchParams, dispatch]);
-
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+    let request;
+    const timer = setTimeout(() => { request = dispatch(exploreServers({ search: search.trim() })); }, 300);
+    return () => { clearTimeout(timer); request?.abort(); };
+  }, [search, dispatch]);
+  const join = async (id) => {
+    if (joining) return;
+    setJoining(id);
+    const result = await dispatch(joinServer(id));
+    setJoining(null);
+    if (joinServer.fulfilled.match(result)) navigate("/main");
   };
-
-  const handleJoinServer = (serverId) => {
-    dispatch(joinServer(serverId)).then((action) => {
-      if (action.meta.requestStatus === "fulfilled") {
-        navigate("/main"); // Redirigir a la MainPage
-      } else {
-        // Aquí podrías manejar el error si la unión al servidor falla
-        console.error("Error al unirse al servidor:", action.payload);
-      }
-    });
-  };
-
-  const handleBackToMain = () => {
-    navigate("/main");
-  };
-
-  return (
-    <div className="max-w-4xl mx-auto p-6 bg-gray-100">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Explore Servers</h1>
-        <button
-          onClick={handleBackToMain}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          Volver
-        </button>
-      </div>
-      <div className="flex justify-center mb-6">
-        <input
-          type="text"
-          className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Search servers..."
-          value={searchTerm}
-          onChange={handleSearchChange}
-        />
-      </div>
-      {isLoading && <p className="text-center text-gray-600">Loading...</p>}
-      {errors?.detail && <p className="text-center text-red-500">{errors.detail}</p>}
-      <ul className="space-y-4">
-        {servers.length > 0 ? (
-          servers.map((server) => (
-            <li key={server.id} className="flex items-center p-4 bg-white border border-gray-200 rounded-lg shadow-md">
-              <div className="mr-4">
-                <img 
-                  src={server.icon || '/default-icon.png'} 
-                  alt={`${server.name} icon`} 
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-xl font-semibold text-gray-800">{server.name}</h2>
-                <p className="text-gray-600">{server.description}</p>
-              </div>
-              <button
-                onClick={() => handleJoinServer(server.id)}
-                className="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
-              >
-                Unirse
-              </button>
-            </li>
-          ))
-        ) : (
-          <p className="text-center text-gray-600">Servidores no encontrados.</p>
-        )}
-      </ul>
-    </div>
-  );
-};
-
-export default ExploreServers;
+  return <main className="explore-page"><header><Link to="/main" className="brand">◈ TeamHub</Link><Link to="/main" className="back-link">← Volver al equipo</Link></header>
+    <section className="explore-heading"><span className="eyebrow">ENCUENTRA TU LUGAR</span><h1>Buenas conversaciones.<br />Nuevas conexiones.</h1><p>Descubre espacios para aprender, crear y compartir.</p><label className="sr-only" htmlFor="server-search">Buscar servidores</label><input id="server-search" type="search" placeholder="Buscar una comunidad…" value={search} onChange={(event) => setSearch(event.target.value)} /></section>
+    {isLoading && <p role="status">Buscando servidores…</p>}{errors && <p role="alert" className="form-error">{errors}</p>}
+    <ul className="server-grid">{servers.map((server) => {
+      const member = profile && (server.owner === profile.user__id || server.members?.includes(profile.user__id));
+      return <li className="server-card" key={server.id}><div className="server-card-banner" aria-hidden="true">{server.name.slice(0, 2).toUpperCase()}</div><div className="server-card-body"><h2>{server.name}</h2><p>{server.description || "Un espacio para conectar con tu equipo."}</p><span className="member-count">{server.members?.length || 0} miembros</span><button className="primary-button" disabled={!!joining || !profile} onClick={() => member ? navigate("/main") : join(server.id)}>{member ? "Ir al equipo →" : joining === server.id ? "Uniéndote…" : "Unirse al servidor →"}</button></div></li>;
+    })}</ul>
+    {!isLoading && !servers.length && <p className="empty-search">No encontramos servidores. Prueba con otro nombre.</p>}
+  </main>;
+}

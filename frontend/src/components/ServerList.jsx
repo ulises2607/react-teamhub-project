@@ -1,82 +1,16 @@
-import React, { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
-import { getServers, servers } from "../redux/serverSlice";
-
-const ServerList = ({ onSelectServer }) => {
+import { getServers } from "../redux/serverSlice";
+export default function ServerList({ currentServer, onSelectServer }) {
   const dispatch = useDispatch();
-  const [hoveredServer, setHoveredServer] = useState(null);
-  const [selectedServer, setSelectedServer] = useState(null);
-  const isLoading = useSelector((state) => state.servers.isLoading);
-  const profile = useSelector((state) => state.profile.data);
-  const serversData = useSelector(servers);
-
-  useEffect(() => {
-    dispatch(getServers());
-  }, [dispatch]);
-
-  if (isLoading) {
-    return <div>Cargando servidores...</div>;
-  }
-
-  if (!profile) {
-    return <div>No se pudo cargar el perfil</div>;
-  }
-
-  const filteredServers = serversData?.servers.filter(
-    (server) =>
-      server.members.includes(profile.user__id) ||
-      server.owner === profile.user__id
-  );
-
-  const handleSelectServer = (serverId, serverName) => {
-    setSelectedServer(serverId);
-    onSelectServer(serverId, serverName);
-  };
-
-  return (
-    <div className="p-4 w-full bg-gray-900 h-full relative">
-      <img
-        src="./logo.jpeg"
-        alt=""
-        className="w-14 h-14 rounded-full flex justify-center items-center mb-4 ml-2 border-b-white"
-      />
-      <div className="border-[1px] mb-5"></div>
-      <ul>
-        {filteredServers && filteredServers.length > 0 ? (
-          filteredServers.map((server) => (
-            <li
-              key={server.id}
-              className={`mb-2 text-white cursor-pointer relative flex items-center ${
-                selectedServer === server.id ? "selected" : ""
-              }`}
-              onClick={() => handleSelectServer(server.id, server.name)}
-              onMouseEnter={() => setHoveredServer(server.id)}
-              onMouseLeave={() => setHoveredServer(null)}
-            >
-              {/* Barrita blanca a la izquierda */}
-              <div
-                className={`absolute rounded left-0 h-full w-1 bg-transparent transition-all duration-300 ${
-                  selectedServer === server.id
-                    ? "scale-y-50 bg-white"
-                    : "scale-y-0"
-                } origin-[4px] `}
-              ></div>
-              <div className="bg-white h-12 w-12 ml-4 flex items-center justify-center text-black text-2xl font-semibold rounded-3xl mb-1 overflow-hidden hover:rounded-lg transition-all duration-300">
-                <img src={server.icon} alt="server-icon" />
-              </div>
-              {hoveredServer === server.id && (
-                <div className="absolute left-16 top-1/2 transform -translate-y-1/2 bg-black text-white text-xs px-2 py-1 rounded-md z-50 shadow-lg">
-                  {server.name}
-                </div>
-              )}
-            </li>
-          ))
-        ) : (
-          <div className="text-white">No tienes servidores disponibles</div>
-        )}
-      </ul>
-    </div>
-  );
-};
-
-export default ServerList;
+  const { servers, isLoading, errors } = useSelector((state) => state.servers);
+  const { data: profile, error: profileError } = useSelector((state) => state.profile);
+  const ownServers = servers.filter((server) => server.members?.includes(profile?.user__id) || server.owner === profile?.user__id);
+  return <div className="server-list"><div className="rail-logo" aria-hidden="true">◈</div>
+    {isLoading && <span className="rail-status" role="status">Cargando…</span>}
+    {(errors || profileError) && <button title={errors || profileError} onClick={() => dispatch(getServers())} aria-label="Reintentar cargar servidores">↻</button>}
+    <ul>{ownServers.map((server) => <li key={server.id}><button onClick={() => onSelectServer(server.id, server.name)} aria-label={server.name} title={server.name} aria-pressed={currentServer === server.id} className={`server-icon ${currentServer === server.id ? "active" : ""}`}>{server.icon ? <img src={server.icon} alt="" /> : server.name.slice(0, 2).toUpperCase()}</button></li>)}</ul>
+    {!isLoading && !errors && profile && !ownServers.length && <p className="rail-status">Aún no tienes servidores</p>}
+  </div>;
+}
+ServerList.propTypes = { currentServer: PropTypes.oneOfType([PropTypes.number, PropTypes.string]), onSelectServer: PropTypes.func.isRequired };

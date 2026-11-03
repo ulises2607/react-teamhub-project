@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useState } from "react";
 
 const MessageCard = ({ username, userImage, content, time, deleteMessage, isDeleting }) => {
@@ -22,4 +23,5 @@ const MessageCard = ({ username, userImage, content, time, deleteMessage, isDele
     </article>
   );
 };
+MessageCard.propTypes = { username: PropTypes.string, userImage: PropTypes.string, content: PropTypes.string, time: PropTypes.string, deleteMessage: PropTypes.func.isRequired, isDeleting: PropTypes.bool };
 export default MessageCard;
