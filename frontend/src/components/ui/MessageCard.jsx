@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 
-const MessageCard = ({ username, userImage, content, time, deleteMessage, isDeleting }) => {
+const MessageCard = ({ username, userImage, content, time, deleteMessage, isDeleting, canDelete }) => {
   const [failedImage, setFailedImage] = useState(false);
   const date = time ? new Date(time) : null;
   const validDate = date && !Number.isNaN(date.getTime());
@@ -15,13 +15,13 @@ const MessageCard = ({ username, userImage, content, time, deleteMessage, isDele
           <div className="flex flex-wrap items-baseline gap-2"><span className="font-semibold text-white">{name}</span>
             {validDate && <time dateTime={date.toISOString()} title={date.toLocaleString()} className="text-gray-400 text-xs">{date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</time>}
           </div>
-          <button type="button" onClick={deleteMessage} disabled={isDeleting} aria-label={`Eliminar mensaje de ${name}`}
-            className="text-red-300 hover:text-red-200 text-xs disabled:opacity-50">{isDeleting ? "Eliminando..." : "Eliminar"}</button>
+          {canDelete && <button type="button" onClick={deleteMessage} disabled={isDeleting} aria-label={`Eliminar mensaje de ${name}`}
+            className="text-red-300 hover:text-red-200 text-xs disabled:opacity-50">{isDeleting ? "Eliminando..." : "Eliminar"}</button>}
         </div>
         <p className="text-gray-100 text-sm mt-1 whitespace-pre-wrap break-words">{content}</p>
       </div>
     </article>
   );
 };
-MessageCard.propTypes = { username: PropTypes.string, userImage: PropTypes.string, content: PropTypes.string, time: PropTypes.string, deleteMessage: PropTypes.func.isRequired, isDeleting: PropTypes.bool };
+MessageCard.propTypes = { username: PropTypes.string, userImage: PropTypes.string, content: PropTypes.string, time: PropTypes.string, deleteMessage: PropTypes.func.isRequired, isDeleting: PropTypes.bool, canDelete: PropTypes.bool };
 export default MessageCard;

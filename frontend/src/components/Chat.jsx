@@ -7,6 +7,7 @@ import MessageCard from "./ui/MessageCard";
 const Chat = ({ currentChannel, channelName }) => {
   const dispatch = useDispatch();
   const { messages, isLoading, isSending, deletingIds, errors, channelId } = useSelector((state) => state.messages);
+  const profile = useSelector((state) => state.profile.data);
   const end = useRef(null);
   const stickToBottom = useRef(true);
   useEffect(() => { if (stickToBottom.current) end.current?.scrollIntoView({ block: "end" }); }, [messages.length]);
@@ -35,8 +36,8 @@ const Chat = ({ currentChannel, channelName }) => {
           <div role="log" aria-label="Mensajes del canal" aria-live="polite">
             {channelId === currentChannel && messages.length > 0 ? messages.map((message) => (
               <MessageCard key={message.id} username={message.authorProfile?.first_name}
-                userImage={message.authorProfile?.bio} content={message.content} time={message.created_at}
-                isDeleting={deletingIds.includes(message.id)} deleteMessage={() => dispatch(deleteMessage(message.id))} />
+                userImage={message.authorProfile?.profile_image} content={message.content} time={message.created_at}
+                canDelete={message.author === profile?.user__id} isDeleting={deletingIds.includes(message.id)} deleteMessage={() => dispatch(deleteMessage(message.id))} />
             )) : <div className="py-16 text-center"><h4 className="text-xl font-semibold">Bienvenido a #{channelName}</h4><p className="mt-2 text-gray-300">La conversación empieza con vos. Envía el primer mensaje.</p></div>}
           </div>
         )}

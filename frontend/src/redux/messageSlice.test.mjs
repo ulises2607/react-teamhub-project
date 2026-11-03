@@ -3,9 +3,8 @@ import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 
 const source = (await readFile(new URL('./messageSlice.js', import.meta.url), 'utf8'))
-  .replace('import.meta.env.VITE_API_URL', '"https://example.invalid"')
-  .replace('"@reduxjs/toolkit"', JSON.stringify(import.meta.resolve('@reduxjs/toolkit')))
-  .replace('"axios"', JSON.stringify(import.meta.resolve('axios')));
+  .replace('"../lib/api"', JSON.stringify('data:text/javascript,export const api={};export const getAll=()=>{};export const errorText=()=>{};'))
+  .replace('"@reduxjs/toolkit"', JSON.stringify(import.meta.resolve('@reduxjs/toolkit')));
 const { default: reducer, getMessages, sendMessage, clearMessages } = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
 
 test('late responses cannot replace the selected channel', () => {
@@ -31,5 +30,14 @@ test('clearing messages invalidates pending requests', () => {
   let state = reducer(undefined, getMessages.pending('load', 2));
   state = reducer(state, clearMessages());
   state = reducer(state, getMessages.fulfilled([{ id: 9 }], 'load', 2));
+  assert.deepEqual(state.messages, []);
+});
+
+
+test('a send from a cleared session cannot appear after signing in again', () => {
+  let state = reducer(undefined, sendMessage.pending('old-send', { channel: 1 }));
+  state = reducer(state, clearMessages());
+  state = reducer(state, getMessages.pending('new-load', 1));
+  state = reducer(state, sendMessage.fulfilled({ id: 99 }, 'old-send', { channel: 1 }));
   assert.deepEqual(state.messages, []);
 });

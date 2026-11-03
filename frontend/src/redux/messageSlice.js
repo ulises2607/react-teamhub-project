@@ -47,7 +47,7 @@ export const deleteMessage = createAsyncThunk("messages/deleteMessage", async (i
 
 const initialState = {
   messages: [], isLoading: false, isSending: false, deletingIds: [], errors: null,
-  channelId: null, requestId: null,
+  channelId: null, requestId: null, sendRequestId: null, deleteRequests: {},
 };
 const messageSlice = createSlice({
   name: "messages", initialState,
@@ -71,27 +71,37 @@ const messageSlice = createSlice({
         state.isLoading = false;
         if (!action.meta.aborted) state.errors = action.payload;
       })
-      .addCase(sendMessage.pending, (state) => {
+      .addCase(sendMessage.pending, (state, action) => {
+        state.sendRequestId = action.meta.requestId;
         state.isSending = true;
         state.errors = null;
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
+        if (state.sendRequestId !== action.meta.requestId) return;
+        state.sendRequestId = null;
         state.isSending = false;
         if (String(state.channelId) === String(action.meta.arg.channel)) state.messages.push(action.payload);
       })
       .addCase(sendMessage.rejected, (state, action) => {
+        if (state.sendRequestId !== action.meta.requestId) return;
+        state.sendRequestId = null;
         state.isSending = false;
         if (String(state.channelId) === String(action.meta.arg.channel)) state.errors = action.payload;
       })
       .addCase(deleteMessage.pending, (state, action) => {
         state.deletingIds.push(action.meta.arg);
+        state.deleteRequests[action.meta.arg] = action.meta.requestId;
         state.errors = null;
       })
       .addCase(deleteMessage.fulfilled, (state, action) => {
+        if (state.deleteRequests[action.meta.arg] !== action.meta.requestId) return;
+        delete state.deleteRequests[action.meta.arg];
         state.deletingIds = state.deletingIds.filter((id) => id !== action.meta.arg);
         state.messages = state.messages.filter((message) => message.id !== action.payload);
       })
       .addCase(deleteMessage.rejected, (state, action) => {
+        if (state.deleteRequests[action.meta.arg] !== action.meta.requestId) return;
+        delete state.deleteRequests[action.meta.arg];
         state.deletingIds = state.deletingIds.filter((id) => id !== action.meta.arg);
         state.errors = action.payload;
       });

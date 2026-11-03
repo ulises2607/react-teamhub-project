@@ -26,7 +26,7 @@ export default function App() {
       window.removeEventListener("storage", syncSession);
     };
   }, [dispatch]);
-  return <Routes>
+  return <>{import.meta.env.MODE === "demo" && <div className="demo-banner">Demo local · datos de ejemplo · usuario: demo / contraseña: teamhub</div>}<Routes>
     <Route path="/home" element={<HomePage />} />
     <Route path="/login" element={<LoginForm />} />
     <Route element={<ProtectedRoutes />}>
@@ -35,5 +35,5 @@ export default function App() {
       <Route path="/explore-servers" element={<ExploreServers />} />
     </Route>
     <Route path="*" element={<Navigate to="/main" replace />} />
-  </Routes>;
+  </Routes></>;
 }
