@@ -149,3 +149,35 @@ test('missing author profiles do not hide messages or duplicate a successful sen
   await expect(page.getByRole('article').filter({ hasText: 'Mensaje sin perfil' })).toHaveCount(1);
   await expect(page.getByLabel('Mensaje para #general', { exact: true })).toHaveValue('');
 });
+
+test('two isolated sessions: sent messages arrive only after receiver reloads', async ({ browser }) => {
+  const sender = await browser.newContext();
+  const receiver = await browser.newContext();
+  const a = await sender.newPage();
+  const b = await receiver.newPage();
+  try {
+    await login(a); await channel(a);
+    await login(b); await channel(b);
+    await expect(b.getByRole('article')).toHaveCount(3);
+    let receiverRefreshes = 0;
+    let sockets = 0;
+    b.on('request', (request) => {
+      if (request.method() === 'GET' && request.url().includes('/teamhub/messages/')) receiverRefreshes++;
+    });
+    b.on('websocket', () => sockets++);
+    const message = `Prueba entre sesiones ${Date.now()}`;
+    await a.getByLabel('Mensaje para #general', { exact: true }).fill(message);
+    await a.getByRole('button', { name: 'Enviar', exact: true }).click();
+    await expect(a.getByText(message, { exact: true })).toBeVisible();
+    // Deliberate observation window: verify absence of automatic delivery.
+    await b.waitForTimeout(3000);
+    await expect(b.getByText(message, { exact: true })).toHaveCount(0);
+    expect(receiverRefreshes).toBe(0);
+    expect(sockets).toBe(0);
+    await b.reload();
+    await channel(b);
+    await expect(b.getByText(message, { exact: true })).toBeVisible();
+  } finally {
+    await sender.close(); await receiver.close();
+  }
+});

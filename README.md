@@ -46,3 +46,11 @@ Compila desde `frontend` con `npm run build`; los archivos quedan en `frontend/d
 ## Autores
 
 Cesar Ulises Cappa Subelza y Rodrigo Eduardo Gonza.
+
+## Entrega de mensajes entre sesiones
+
+El chat actual **no recibe mensajes en tiempo real**. Consulta el historial al abrir un canal y agrega al estado local el resultado de sus propios envíos. No hay WebSocket, Server-Sent Events ni polling.
+
+La prueba mock `two isolated sessions` abre dos contextos de navegador independientes, envía desde A y observa B durante 3 segundos: B no hace nuevas consultas de mensajes y no muestra el mensaje. Después de recargar B y volver a abrir el canal, el mensaje sí aparece. Es una prueba diagnóstica del comportamiento actual, no una garantía de sincronización; deberá cambiar al implementar recepción automática.
+
+Para revisar la demo local usa `demo` / `teamhub` en http://127.0.0.1:4173. Estas credenciales solo funcionan en la demo, no en el servicio externo. Puedes repetir la observación abriendo otra ventana privada con la misma cuenta y seleccionando `Estudio Creativo` → `general` en ambas.
